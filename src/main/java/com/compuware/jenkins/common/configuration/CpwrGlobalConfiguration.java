@@ -255,11 +255,23 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		return m_topazCLILocationLinux;
 	}
 
+	/**
+	 * Set the Topaz CLI installation location for Windows systems.
+	 * 
+	 * @param location
+	 *            the install directory
+	 */
 	public void setTopazCLILocationWindows(String location)
 	{
 		m_topazCLILocationWindows = location;
 	}
 
+	/**
+	 * Set the Topaz CLI installation location for Linux systems.
+	 * 
+	 * @param location
+	 *            the install directory
+	 */
 	public void setTopazCLILocationLinux(String location)
 	{
 		m_topazCLILocationLinux = location;

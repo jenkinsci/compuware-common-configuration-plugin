@@ -173,6 +173,9 @@ public class CpwrGlobalConfigurationTest
 		assertEquals("Expected linux location.", expectedLocation, actualLocation);
 	}
 
+	/**
+	 * Test launcher
+	 */
 	private class TestLauncher extends Launcher
 	{
 		private boolean m_isUnix;
