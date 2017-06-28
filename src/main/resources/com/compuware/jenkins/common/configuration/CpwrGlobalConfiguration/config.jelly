@@ -9,15 +9,15 @@
       <f:repeatable var="hostConn" items="${instance.hostConnections}" add="${%addHostConnection}">
         <table width="100%" class="cpwr-hostConnection">
           <f:entry title="${%name}" field="connectionName" >
-            <f:textbox value="${inst.getConnectionName()}" checkUrl="'${rootURL}/descriptor/CpwrGlobalConfiguration/checkConnectionName?value='+this.value"/>
+            <f:textbox value="${hostConn.getConnectionName()}" checkUrl="'${rootURL}/descriptor/CpwrGlobalConfiguration/checkConnectionName?value='+this.value"/>
           </f:entry>
           
           <f:entry title="${%hostPort}" field="hostPort">
-            <f:textbox value="${inst.getHostPort()}" checkUrl="'${rootURL}/descriptor/CpwrGlobalConfiguration/checkHostPort?value='+this.value"/>
+            <f:textbox value="${hostConn.getHostPort()}" checkUrl="'${rootURL}/descriptor/CpwrGlobalConfiguration/checkHostPort?value='+this.value"/>
           </f:entry>
          
       	  <f:entry title="${%codePage}" field="codePage">
-            <f:select default="1047" value="${inst.getCodePage()}"/>
+            <f:select default="1047" value="${hostConn.getCodePage()}"/>
           </f:entry>
       	  
           <f:entry title="">

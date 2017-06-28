@@ -65,10 +65,9 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		return m_hostConnections;
 	}
 
-	public void setHostConnectionss(HostConnection... connections)
+	public void setHostConnections(HostConnection... connections)
 	{
-		this.m_hostConnections = connections;
-		save();
+		m_hostConnections = connections;
 	}
 
 	/* (non-Javadoc)
@@ -78,7 +77,9 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	public boolean configure(StaplerRequest req, JSONObject json)
 	{
 		List<HostConnection> list = req.bindJSONToList(HostConnection.class, json.get(HOST_CONN_INSTANCE_ID));
-		setHostConnectionss(list.toArray(new HostConnection[list.size()]));
+		setHostConnections(list.toArray(new HostConnection[list.size()]));
+
+		save();
 
 		return true;
 	}
