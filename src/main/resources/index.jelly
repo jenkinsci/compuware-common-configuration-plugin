@@ -3,5 +3,5 @@
   This view is used to render the installed plugins page.
 -->
 <div>
-  This plugin allow users to Compuware plugins to access global configrations.
+  This plugin provides access to Compuware global configurations.
 </div>

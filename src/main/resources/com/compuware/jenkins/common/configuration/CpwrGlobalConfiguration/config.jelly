@@ -16,12 +16,6 @@
             <f:textbox value="${inst.getHostPort()}" checkUrl="'${rootURL}/descriptor/CpwrGlobalConfiguration/checkHostPort?value='+this.value"/>
           </f:entry>
          
-         <!-- 
-          <f:entry title="${%loginCredentials}" field="credentialsId">
-            <c:select value="${inst.getCredentialsId()}" />
-      	  </f:entry>
-      	  -->
-      	  
       	  <f:entry title="${%codePage}" field="codePage">
             <f:select default="1047" value="${inst.getCodePage()}"/>
           </f:entry>
