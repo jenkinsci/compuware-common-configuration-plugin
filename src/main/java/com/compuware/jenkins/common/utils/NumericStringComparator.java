@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * 
+ * Performs numeric string comparison.
  */
 public class NumericStringComparator implements Comparator<String>, Serializable
 {
