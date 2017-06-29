@@ -49,11 +49,16 @@ public class HostConnection implements Serializable
 		m_codePage = StringUtils.trimToEmpty(codePage);
 	}
 
+	/**
+	 * Gets the value of the host connection 'Name'.
+	 * 
+	 * @return <code>String</code> value of m_connectionName
+	 */
 	public String getConnectionName()
 	{
 		return m_connectionName;
 	}
-	
+
 	/**
 	 * Gets the value of the 'Host:Port'.
 	 * 
@@ -63,7 +68,7 @@ public class HostConnection implements Serializable
 	{
 		return m_hostPort;
 	}
-	
+
 	/**
 	 * Gets the value of the 'Code Page'.
 	 * 

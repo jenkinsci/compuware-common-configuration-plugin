@@ -17,47 +17,41 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ * Test class for the numeric string comparitor.
  */
 @SuppressWarnings("nls")
 public class NumericStringComparatorTest
 {
-
-	@Before
-	public void setUp()
-	{
-	}
-
 	/**
-	 * 
+	 * Test the numeric string comparator for equals, less than, greater than, null, and bad values.
 	 */
 	@Test
 	public void compareTest()
 	{
 		NumericStringComparator comparator = new NumericStringComparator();
-		
-		//equals
+
+		// equals
 		String leftSide = "3";
 		String rightSide = "3";
 		int expectedResult = 0;
 		int actualResult = comparator.compare(leftSide, rightSide);
 		assertEquals("Expect equals.", expectedResult, actualResult);
-		
-		//less than
+
+		// less than
 		leftSide = "1";
 		rightSide = "3";
 		actualResult = comparator.compare(leftSide, rightSide);
 		assertTrue("Expect less than.", actualResult < 0);
-		
-		//greater than
-		
+
+		// greater than
+
 		leftSide = "7";
 		rightSide = "3";
 		expectedResult = 1;
 		actualResult = comparator.compare(leftSide, rightSide);
 		assertTrue("Expect greater than.", actualResult > 0);
-		
-		//bad value
+
+		// bad value
 		leftSide = "XXX7";
 		rightSide = "3";
 		try

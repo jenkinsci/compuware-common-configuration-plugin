@@ -61,14 +61,21 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
+	 * Get the list of host connections.
 	 * 
-	 * @return
+	 * @return list of host connections
 	 */
 	public HostConnection[] getHostConnections()
 	{
 		return m_hostConnections;
 	}
 
+	/**
+	 * Set host connections.
+	 * 
+	 * @param connections
+	 *            one or more host connections
+	 */
 	public void setHostConnections(HostConnection... connections)
 	{
 		m_hostConnections = connections;
@@ -169,7 +176,6 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 
 		return result;
 	}
-
 
 	/**
 	 * Validation for the host and port.

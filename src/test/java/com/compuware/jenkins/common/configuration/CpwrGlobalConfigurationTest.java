@@ -221,6 +221,5 @@ public class CpwrGlobalConfigurationTest
 		{
 			return m_isUnix;
 		}
-
 	}
 }
