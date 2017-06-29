@@ -1,2 +1,2 @@
 # CPWR-Common
-Compuware Topaz ® interface for common code
+Compuware Topaz (R) interface for common code
