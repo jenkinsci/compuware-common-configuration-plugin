@@ -36,6 +36,5 @@
 	      </f:repeatable>
       </div>
     </f:entry>
-
   </f:section>
 </j:jelly>
