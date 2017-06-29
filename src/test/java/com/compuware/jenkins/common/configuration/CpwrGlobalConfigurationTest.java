@@ -18,11 +18,18 @@ package com.compuware.jenkins.common.configuration;
 
 import static org.junit.Assert.assertEquals;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Map;
 import javax.servlet.ServletException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.Proc;
+import hudson.model.TaskListener;
+import hudson.remoting.Channel;
 import hudson.util.FormValidation;
 import hudson.util.FormValidation.Kind;
 
@@ -138,5 +145,81 @@ public class CpwrGlobalConfigurationTest
 		System.out.println("Expected: " + expectedMsg);
 		System.out.println("Actual  : " + expectedMsg);
 		assertEquals(msg, expectedMsg, actualMsg);
+	}
+
+	/**
+	 * Test the windows CLI location.
+	 */
+	@Test
+	public void cliLocationWindowsTest()
+	{
+		TestLauncher windowsLauncher = new TestLauncher(false);
+		String expectedLocation = "C:\test\folder";
+		m_globalConfig.setTopazCLILocationWindows(expectedLocation);
+		String actualLocation = m_globalConfig.getTopazCLILocation(windowsLauncher);
+		assertEquals("Expected windows location.", expectedLocation, actualLocation);
+	}
+
+	/**
+	 * Test the linux CLI location.
+	 */
+	@Test
+	public void cliLocationLinuxTest()
+	{
+		TestLauncher linuxLauncher = new TestLauncher(true);
+		String expectedLocation = "opt\test\folder";
+		m_globalConfig.setTopazCLILocationLinux(expectedLocation);
+		String actualLocation = m_globalConfig.getTopazCLILocation(linuxLauncher);
+		assertEquals("Expected linux location.", expectedLocation, actualLocation);
+	}
+
+	/**
+	 * Test launcher
+	 */
+	private class TestLauncher extends Launcher
+	{
+		private boolean m_isUnix;
+
+		public TestLauncher(boolean isUnix)
+		{
+			super(TaskListener.NULL, null);
+			m_isUnix = isUnix;
+		}
+
+		/* (non-Javadoc)
+		 * @see hudson.Launcher#launch(hudson.Launcher.ProcStarter)
+		 */
+		@Override
+		public Proc launch(ProcStarter starter) throws IOException
+		{
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see hudson.Launcher#launchChannel(java.lang.String[], java.io.OutputStream, hudson.FilePath, java.util.Map)
+		 */
+		@Override
+		public Channel launchChannel(String[] cmd, OutputStream out, FilePath workDir, Map<String, String> envVars)
+				throws IOException, InterruptedException
+		{
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see hudson.Launcher#kill(java.util.Map)
+		 */
+		@Override
+		public void kill(Map<String, String> modelEnvVars) throws IOException, InterruptedException
+		{
+		}
+
+		/* (non-Javadoc)
+		 * @see hudson.Launcher#isUnix()
+		 */
+		@Override
+		public boolean isUnix()
+		{
+			return m_isUnix;
+		}
 	}
 }

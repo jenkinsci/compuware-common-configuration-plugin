@@ -4,31 +4,37 @@
          
   <f:section title="${%title}">
   
+      <f:entry title="${%topazWbCliDirectoryWindows}" field="topazCLILocationWindows">
+        <f:textbox name="topazCLILocationWindows" default="C:\Program Files\Compuware\Topaz Workbench CLI"/>
+      </f:entry>
+      <f:entry title="${%topazWbCliDirectoryLinux}" field="topazCLILocationLinux">
+        <f:textbox name="topazCLILocationLinux" default="/opt/Compuware/TopazCLI"/>
+	  </f:entry>
+      
       <f:entry title="${%hostConnections}" description="${%hostConnectionsDescr}">
-      <div class="cpwr-section">
-      <f:repeatable var="hostConn" items="${instance.hostConnections}" add="${%addHostConnection}">
-        <table width="100%" class="cpwr-hostConnection">
-          <f:entry title="${%name}" field="connectionName" >
-            <f:textbox value="${hostConn.getConnectionName()}" checkUrl="'${rootURL}/descriptor/CpwrGlobalConfiguration/checkConnectionName?value='+this.value"/>
-          </f:entry>
-          
-          <f:entry title="${%hostPort}" field="hostPort">
-            <f:textbox value="${hostConn.getHostPort()}" checkUrl="'${rootURL}/descriptor/CpwrGlobalConfiguration/checkHostPort?value='+this.value"/>
-          </f:entry>
-         
-      	  <f:entry title="${%codePage}" field="codePage">
-            <f:select default="1047" value="${hostConn.getCodePage()}"/>
-          </f:entry>
-      	  
-          <f:entry title="">
-            <div align="right">
-              <f:repeatableDeleteButton value="${%deleteHostConnection}"/>
-            </div>
-          </f:entry>
-        </table>
-      </f:repeatable>
+      	<div class="cpwr-section">
+	      <f:repeatable var="hostConn" items="${instance.hostConnections}" add="${%addHostConnection}">
+	        <table width="100%" class="cpwr-hostConnection">
+	          <f:entry title="${%name}" field="connectionName" >
+	            <f:textbox value="${hostConn.getConnectionName()}" checkUrl="'${rootURL}/descriptor/CpwrGlobalConfiguration/checkConnectionName?value='+this.value"/>
+	          </f:entry>
+	          
+	          <f:entry title="${%hostPort}" field="hostPort">
+	            <f:textbox value="${hostConn.getHostPort()}" checkUrl="'${rootURL}/descriptor/CpwrGlobalConfiguration/checkHostPort?value='+this.value"/>
+	          </f:entry>
+	         
+	      	  <f:entry title="${%codePage}" field="codePage">
+	            <f:select default="1047" value="${hostConn.getCodePage()}"/>
+	          </f:entry>
+	      	  
+	          <f:entry title="">
+	            <div align="right">
+	              <f:repeatableDeleteButton value="${%deleteHostConnection}"/>
+	            </div>
+	          </f:entry>
+	        </table>
+	      </f:repeatable>
       </div>
     </f:entry>
-
   </f:section>
 </j:jelly>

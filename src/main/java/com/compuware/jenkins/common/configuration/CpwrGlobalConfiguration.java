@@ -29,6 +29,7 @@ import com.compuware.jenkins.common.utils.Constants;
 import com.compuware.jenkins.common.utils.NumericStringComparator;
 import hudson.CopyOnWrite;
 import hudson.Extension;
+import hudson.Launcher;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
@@ -47,6 +48,9 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 
 	@CopyOnWrite
 	private volatile HostConnection[] m_hostConnections = new HostConnection[0];
+
+	private String m_topazCLILocationWindows;
+	private String m_topazCLILocationLinux;
 
 	/**
 	 * Constructor.
@@ -85,6 +89,9 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	{
 		List<HostConnection> list = req.bindJSONToList(HostConnection.class, json.get(HOST_CONN_INSTANCE_ID));
 		setHostConnections(list.toArray(new HostConnection[list.size()]));
+
+		m_topazCLILocationWindows = req.getParameter("topazCLILocationWindows"); //$NON-NLS-1$
+		m_topazCLILocationLinux = req.getParameter("topazCLILocationLinux"); //$NON-NLS-1$
 
 		save();
 
@@ -215,5 +222,64 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		}
 
 		return FormValidation.ok();
+	}
+
+	/**
+	 * Returns the Topaz Workbench CLI location based on node
+	 * 
+	 * @return CLI location
+	 */
+	public String getTopazCLILocation(Launcher launcher)
+	{
+		if (launcher.isUnix())
+		{
+			return m_topazCLILocationLinux;
+		}
+		else
+		{
+			return m_topazCLILocationWindows;
+		}
+	}
+
+	/**
+	 * Returns the value of the topazCLILocationLinux. Used for databinding.
+	 * 
+	 * @return CLI location - Windows
+	 */
+	public String getTopazCLILocationWindows()
+	{
+		return m_topazCLILocationWindows;
+	}
+
+	/**
+	 * Returns the value of the topazCLILocationLinux field. Used for databinding.
+	 * 
+	 * @return CLI location - Linux
+	 */
+	public String getTopazCLILocationLinux()
+	{
+		return m_topazCLILocationLinux;
+	}
+
+	/**
+	 * Set the Topaz CLI installation location for Windows systems.
+	 * 
+	 * @param location
+	 *            the install directory
+	 */
+	public void setTopazCLILocationWindows(String location)
+	{
+		m_topazCLILocationWindows = location;
+	}
+
+	/**
+	 * Set the Topaz CLI installation location for Linux systems.
+	 * 
+	 * @param location
+	 *            the install directory
+	 */
+	public void setTopazCLILocationLinux(String location)
+	{
+		m_topazCLILocationLinux = location;
 	}
 }
