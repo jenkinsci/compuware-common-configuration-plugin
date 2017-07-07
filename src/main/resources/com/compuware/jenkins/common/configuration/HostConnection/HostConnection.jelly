@@ -1,0 +1,20 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<table width="100%" class="cpwr-hostConnection">
+		<f:entry title="${%description}" field="connectionName" >
+	    	<f:textbox value="${hostConn.getConnectionName()}" checkUrl="'${rootURL}/descriptorByName/HostConnection/checkConnectionName?value='+this.value"/>
+	    </f:entry>
+	    <f:entry title="${%hostPort}" field="hostPort">
+	        <f:textbox value="${hostConn.getHostPort()}" checkUrl="'${rootURL}/descriptorByName/HostConnection/checkHostPort?value='+this.value"/>
+	    </f:entry>
+	    <f:entry title="${%codePage}" field="codePage">
+	        <f:select default="1047" value="${hostConn.getCodePage()}"/>
+	    </f:entry>
+	    <f:entry title="">
+	    	<div align="right">
+	        	<f:repeatableDeleteButton value="${%deleteHostConnection}"/>
+	        </div>
+	    </f:entry>
+	</table>
+</j:jelly>
