@@ -31,40 +31,40 @@ import hudson.util.FormValidation;
  */
 public class HostConnection extends AbstractDescribableImpl<HostConnection>
 {
-	private final String m_connectionName;
+	private final String m_description;
 	private final String m_hostPort;
 	private final String m_codePage;
-	private final String m_id;
+	private final String m_connectionId;
 
 	/**
 	 * Constructor.
 	 * 
-	 * @param connectionName
-	 *            the name of the host connection
+	 * @param description
+	 *            the description of the host connection
 	 * @param hostPort
 	 *            the host:port
 	 * @param codePage
 	 *            the code page to be used for the host connection
-	 * @param id
+	 * @param connectionId
 	 *            a unique identifier
 	 */
 	@DataBoundConstructor
-	public HostConnection(String connectionName, String hostPort, String codePage, String id)
+	public HostConnection(String description, String hostPort, String codePage, String connectionId)
 	{
-		m_connectionName = StringUtils.trimToEmpty(connectionName);
+		m_description = StringUtils.trimToEmpty(description);
 		m_hostPort = StringUtils.trimToEmpty(hostPort);
 		m_codePage = StringUtils.trimToEmpty(codePage);
-		m_id = generateId(id);
+		m_connectionId = generateId(connectionId);
 	}
 
 	/**
-	 * Gets the value of the host connection 'Name'.
+	 * Gets the value of the host description.
 	 * 
-	 * @return <code>String</code> value of m_connectionName
+	 * @return <code>String</code> value of m_description
 	 */
-	public String getConnectionName()
+	public String getDescription()
 	{
-		return m_connectionName;
+		return m_description;
 	}
 
 	/**
@@ -92,9 +92,9 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 * 
 	 * @return <code>String</code> generated connection identifier
 	 */
-	public String getId()
+	public String getConnectionId()
 	{
-		return m_id;
+		return m_connectionId;
 	}
 
 	/**
@@ -106,7 +106,12 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 */
 	public static String generateId(String id)
 	{
-		return StringUtils.isEmpty(id) ? UUID.randomUUID().toString() : id;
+		String generatedId = id;
+		if (StringUtils.isEmpty(generatedId))
+		{
+			generatedId = UUID.randomUUID().toString();
+		}
+		return generatedId;
 	}
 
 	/**
@@ -224,19 +229,19 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 		}
 
 		/**
-		 * Validation for the host connection name text field.
+		 * Validation for the host description text field.
 		 * 
 		 * @param value
-		 *            value passed from the config.jelly "connectionName" field
+		 *            value passed from the config.jelly "description" field
 		 * 
 		 * @return validation message
 		 */
-		public FormValidation doCheckConnectionName(@QueryParameter String value)
+		public FormValidation doCheckDescription(@QueryParameter String value)
 		{
 			String tempValue = StringUtils.trimToEmpty(value);
 			if (tempValue.isEmpty())
 			{
-				return FormValidation.error(Messages.checkConnectionNameEmptyError());
+				return FormValidation.error(Messages.checkDescriptionEmptyError());
 			}
 
 			return FormValidation.ok();
