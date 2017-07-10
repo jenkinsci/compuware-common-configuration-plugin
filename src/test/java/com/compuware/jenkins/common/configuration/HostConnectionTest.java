@@ -109,16 +109,16 @@ public class HostConnectionTest
 	 * Test the host connection name.
 	 */
 	@Test
-	public void hostConnectionNameTest() throws IOException, ServletException
+	public void hostDescriptionTest() throws IOException, ServletException
 	{
 		// empty String
 		String input = "";
-		String expectedMsg = Messages.checkConnectionNameEmptyError();
+		String expectedMsg = Messages.checkDescriptionEmptyError();
 		validateConnectionNameErrorMessage("Expecting empty connection name message.", input, expectedMsg);
 
 		input = "abc:1234";
 		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor())
-				.doCheckConnectionName(input);
+				.doCheckDescription(input);
 		assertEquals("Expecting valid connection name.", validation.kind, Kind.OK);
 	}
 
@@ -136,7 +136,7 @@ public class HostConnectionTest
 			throws IOException, ServletException
 	{
 		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor())
-				.doCheckConnectionName(input);
+				.doCheckDescription(input);
 		String actualMsg = validation.getMessage();
 		System.out.println("Expected: " + expectedMsg);
 		System.out.println("Actual  : " + expectedMsg);
