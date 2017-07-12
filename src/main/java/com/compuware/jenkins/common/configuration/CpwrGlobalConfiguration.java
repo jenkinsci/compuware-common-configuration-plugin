@@ -23,10 +23,16 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import org.kohsuke.stapler.StaplerRequest;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.cloudbees.plugins.credentials.matchers.IdMatcher;
 import com.compuware.jenkins.common.utils.NumericStringComparator;
 import hudson.CopyOnWrite;
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.model.Item;
+import hudson.security.ACL;
 import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
 import net.sf.json.JSONObject;
@@ -37,20 +43,22 @@ import net.sf.json.JSONObject;
 @Extension
 public class CpwrGlobalConfiguration extends GlobalConfiguration
 {
+	// Constants
 	private static final String CODE_PAGE_MAPPINGS = "com.compuware.jenkins.common.configuration.codePageMappings"; //$NON-NLS-1$
-
-	// Host connection instance ID defined in config.jelly
+	/** Host connection instance ID defined in config.jelly */
 	private static final String HOST_CONN_INSTANCE_ID = "hostConn"; //$NON-NLS-1$
 
+	// Member Variables
 	@CopyOnWrite
 	private volatile HostConnection[] m_hostConnections = new HostConnection[0];
-
 	private String m_topazCLILocationWindows;
 	private String m_topazCLILocationLinux;
 
     /**
-     * @return the Jenkins managed singleton for the configuration object 
-     */ 
+	 * Returns the singleton instance.
+	 * 
+	 * @return the Jenkins managed singleton for the configuration object
+	 */ 
     public static CpwrGlobalConfiguration get() 
     { 
         return GlobalConfiguration.all().get(CpwrGlobalConfiguration.class); 
@@ -58,6 +66,8 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 
 	/**
 	 * Constructor.
+	 * <p>
+	 * Clients should not call this - use {@link #get()} instead.
 	 */
 	public CpwrGlobalConfiguration()
 	{
@@ -65,7 +75,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Get the list of host connections.
+	 * Returns the list of host connections.
 	 * 
 	 * @return list of host connections
 	 */
@@ -75,7 +85,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Set host connections.
+	 * Sets the list of host connections.
 	 * 
 	 * @param connections
 	 *            one or more host connections
@@ -85,7 +95,8 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		m_hostConnections = connections;
 	}
 
-	/* (non-Javadoc)
+	/* 
+	 * (non-Javadoc)
 	 * @see hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject)
 	 */
 	@Override
@@ -131,11 +142,12 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Returns the Topaz Workbench CLI location based on node
+	 * Returns the Topaz Workbench CLI location based on node.
 	 * 
 	 * @param launcher
 	 *            launcher for starting a process
-	 * @return CLI location
+	 * 
+	 * @return the <code>String</code> CLI location
 	 */
 	public String getTopazCLILocation(Launcher launcher)
 	{
@@ -170,7 +182,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Set the Topaz CLI installation location for Windows systems.
+	 * Sets the Topaz CLI installation location for Windows systems.
 	 * 
 	 * @param location
 	 *            the install directory
@@ -181,7 +193,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Set the Topaz CLI installation location for Linux systems.
+	 * Sets the Topaz CLI installation location for Linux systems.
 	 * 
 	 * @param location
 	 *            the install directory
@@ -189,5 +201,34 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	public void setTopazCLILocationLinux(String location)
 	{
 		m_topazCLILocationLinux = location;
+	}
+
+	/**
+	 * Retrieves login information given a credentials ID.
+	 * 
+	 * @param project
+	 *            the Jenkins project
+	 * @param credentialsId
+	 *            the <code>String</code> ID of the credentials to obtain
+	 *
+	 * @return credentials with login information
+	 */
+	public StandardUsernamePasswordCredentials getLoginInformation(Item project, String credentialsId)
+	{
+		StandardUsernamePasswordCredentials credential = null;
+
+		List<StandardUsernamePasswordCredentials> credentials = CredentialsProvider.lookupCredentials(
+				StandardUsernamePasswordCredentials.class, project, ACL.SYSTEM, Collections.<DomainRequirement> emptyList());
+
+		IdMatcher matcher = new IdMatcher(credentialsId);
+		for (StandardUsernamePasswordCredentials c : credentials)
+		{
+			if (matcher.matches(c))
+			{
+				credential = (StandardUsernamePasswordCredentials) c;
+			}
+		}
+
+		return credential;
 	}
 }
