@@ -29,6 +29,7 @@ import hudson.Extension;
 import hudson.Launcher;
 import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -41,6 +42,12 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 
 	// Host connection instance ID defined in config.jelly
 	private static final String HOST_CONN_INSTANCE_ID = "hostConn"; //$NON-NLS-1$
+	private static final String DESCRIPTION_ID = "description"; //$NON-NLS-1$
+	private static final String HOST_PORT_ID = "hostPort"; //$NON-NLS-1$
+	private static final String CODE_PAGE_ID = "codePage"; //$NON-NLS-1$
+	private static final String CONNECTION_ID = "connectionId"; //$NON-NLS-1$
+	private static final String TOPAZ_CLI_LOCATION_WINDOWS_ID = "topazCLILocationWindows"; //$NON-NLS-1$
+	private static final String TOPAZ_CLI_LOCATION_LINUX_ID = "topazCLILocationLinux"; //$NON-NLS-1$
 
 	@CopyOnWrite
 	private volatile HostConnection[] m_hostConnections = new HostConnection[0];
@@ -71,7 +78,34 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	 */
 	public HostConnection[] getHostConnections()
 	{
-		return m_hostConnections;
+		HostConnection[] hostConnections = new HostConnection[m_hostConnections.length];
+		for (int i = 0; i < m_hostConnections.length; i++)
+		{
+			hostConnections[i] = new HostConnection(m_hostConnections[i].getDescription(),
+					m_hostConnections[i].getHostPort(), m_hostConnections[i].getCodePage(),
+					m_hostConnections[i].getConnectionId());
+		}
+		return hostConnections;
+	}
+
+	/**
+	 * Get a host connection for the current host connection unique identifier
+	 * 
+	 * @param connectionId a unique connection identifier
+	 * @return a <code>HostConnection</code>; can be null
+	 */
+	public HostConnection getHostConnection(String connectionId)
+	{
+		HostConnection hostConnection = null;
+		for (HostConnection connection : m_hostConnections)
+		{
+			if (connectionId != null && connectionId.matches(connection.getConnectionId()))
+			{
+				hostConnection = connection;
+			}
+		}
+
+		return hostConnection;
 	}
 
 	/**
@@ -91,11 +125,20 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	@Override
 	public boolean configure(StaplerRequest req, JSONObject json)
 	{
-		List<HostConnection> list = req.bindJSONToList(HostConnection.class, json.get(HOST_CONN_INSTANCE_ID));
+		JSONArray hostConnectionsJson = json.getJSONArray(HOST_CONN_INSTANCE_ID);
+		List<HostConnection> list = new ArrayList<HostConnection>();
+		for (Object obj : hostConnectionsJson)
+		{
+			JSONObject hostConnectionJson = (JSONObject) obj;
+			list.add(
+					new HostConnection(hostConnectionJson.getString(DESCRIPTION_ID), hostConnectionJson.getString(HOST_PORT_ID),
+							hostConnectionJson.getString(CODE_PAGE_ID), hostConnectionJson.getString(CONNECTION_ID)));
+		}
+
 		setHostConnections(list.toArray(new HostConnection[list.size()]));
 
-		m_topazCLILocationWindows = req.getParameter("topazCLILocationWindows"); //$NON-NLS-1$
-		m_topazCLILocationLinux = req.getParameter("topazCLILocationLinux"); //$NON-NLS-1$
+		m_topazCLILocationWindows = json.getString(TOPAZ_CLI_LOCATION_WINDOWS_ID);
+		m_topazCLILocationLinux = json.getString(TOPAZ_CLI_LOCATION_LINUX_ID);
 
 		save();
 
