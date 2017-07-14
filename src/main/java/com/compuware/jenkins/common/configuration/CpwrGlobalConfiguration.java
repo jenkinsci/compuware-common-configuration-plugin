@@ -35,7 +35,6 @@ import hudson.model.Item;
 import hudson.security.ACL;
 import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -99,19 +98,26 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Get a host connection for the current host connection unique identifier
+	 * Returns a host connection for the given connection identifier.
 	 * 
-	 * @param connectionId a unique connection identifier
+	 * @param connectionId
+	 *            a unique connection identifier
+	 * 
 	 * @return a <code>HostConnection</code>; can be null
 	 */
 	public HostConnection getHostConnection(String connectionId)
 	{
 		HostConnection hostConnection = null;
-		for (HostConnection connection : m_hostConnections)
+
+		if (connectionId != null)
 		{
-			if (connectionId != null && connectionId.matches(connection.getConnectionId()))
+			for (HostConnection connection : m_hostConnections)
 			{
-				hostConnection = connection;
+				if (connectionId.equalsIgnoreCase(connection.getConnectionId()))
+				{
+					hostConnection = connection;
+					break;
+				}
 			}
 		}
 
@@ -136,15 +142,17 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	@Override
 	public boolean configure(StaplerRequest req, JSONObject json)
 	{
-		JSONArray hostConnectionsJson = json.getJSONArray(HOST_CONN_INSTANCE_ID);
-		List<HostConnection> list = new ArrayList<HostConnection>();
-		for (Object obj : hostConnectionsJson)
-		{
-			JSONObject hostConnectionJson = (JSONObject) obj;
-			list.add(
-					new HostConnection(hostConnectionJson.getString(DESCRIPTION_ID), hostConnectionJson.getString(HOST_PORT_ID),
-							hostConnectionJson.getString(CODE_PAGE_ID), hostConnectionJson.getString(CONNECTION_ID)));
-		}
+		List<HostConnection> list = req.bindJSONToList(HostConnection.class, json.get(HOST_CONN_INSTANCE_ID));
+
+		// JSONArray hostConnectionsJson = json.getJSONArray(HOST_CONN_INSTANCE_ID);
+		// List<HostConnection> list = new ArrayList<HostConnection>();
+		// for (Object obj : hostConnectionsJson)
+		// {
+		// JSONObject hostConnectionJson = (JSONObject) obj;
+		// list.add(
+		// new HostConnection(hostConnectionJson.getString(DESCRIPTION_ID), hostConnectionJson.getString(HOST_PORT_ID),
+		// hostConnectionJson.getString(CODE_PAGE_ID), hostConnectionJson.getString(CONNECTION_ID)));
+		// }
 
 		setHostConnections(list.toArray(new HostConnection[list.size()]));
 
@@ -247,31 +255,31 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Retrieves login information given a credentials ID.
+	 * Retrieves login information given a credentials identifier.
 	 * 
 	 * @param project
 	 *            the Jenkins project
 	 * @param credentialsId
-	 *            the <code>String</code> ID of the credentials to obtain
+	 *            the <code>String</code> identifier of the credentials to obtain
 	 *
 	 * @return credentials with login information
 	 */
 	public StandardUsernamePasswordCredentials getLoginInformation(Item project, String credentialsId)
 	{
-		StandardUsernamePasswordCredentials credential = null;
+		StandardUsernamePasswordCredentials credentials = null;
 
-		List<StandardUsernamePasswordCredentials> credentials = CredentialsProvider.lookupCredentials(
+		List<StandardUsernamePasswordCredentials> credentialsList = CredentialsProvider.lookupCredentials(
 				StandardUsernamePasswordCredentials.class, project, ACL.SYSTEM, Collections.<DomainRequirement> emptyList());
 
 		IdMatcher matcher = new IdMatcher(credentialsId);
-		for (StandardUsernamePasswordCredentials c : credentials)
+		for (StandardUsernamePasswordCredentials c : credentialsList)
 		{
 			if (matcher.matches(c))
 			{
-				credential = (StandardUsernamePasswordCredentials) c;
+				credentials = (StandardUsernamePasswordCredentials) c;
 			}
 		}
 
-		return credential;
+		return credentials;
 	}
 }
