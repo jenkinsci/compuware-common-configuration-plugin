@@ -73,6 +73,166 @@ public class CpwrGlobalConfigurationTest
 		assertEquals("Expected linux location.", expectedLocation, actualLocation);
 	}
 
+//	/**
+//	 * Test saving and reloading of a host connection does not alter the initial connection id.
+//	 */
+//	@Test
+//	public void connectionIdTest()
+//	{
+//		String expectedAlteredHostConnDescription = "HCI Production";
+//
+//		String expectedHostConnDescription = "HCI Prod";
+//		String expectedHostConnHostPort = "cw01:30947";
+//		String expectedHostConnCodePage = "1047";
+//		String expectedHostConnConnectionId = "9876";
+//
+//		String expectedTopazCLILocationLinux = "/opt/Compuware/TopazCLI";
+//		String expectedTopazCLILocationWindows = "C:\\Program Files\\Compuware\\Topaz Workbench CLI";
+//
+//		try
+//		{
+//			JSONObject json = new JSONObject();
+//
+//			JSONObject hostConnection = new JSONObject();
+//			hostConnection.put("description", expectedHostConnDescription);
+//			hostConnection.put("hostPort", expectedHostConnHostPort);
+//			hostConnection.put("codePage", expectedHostConnCodePage);
+//			hostConnection.put("connectionId", expectedHostConnConnectionId);
+//
+//			JSONArray hostConnections = new JSONArray();
+//			hostConnections.add(hostConnection);
+//
+//			json.put("hostConn", hostConnections);
+//
+//			json.put("topazCLILocationWindows", expectedTopazCLILocationWindows);
+//			json.put("topazCLILocationLinux", expectedTopazCLILocationLinux);
+//
+//			CpwrGlobalConfiguration before = new CpwrGlobalConfiguration();
+//			before.configure(Stapler.getCurrentRequest(), json);
+//
+//			CpwrGlobalConfiguration after = new CpwrGlobalConfiguration();
+//			after.load();
+//
+//			assertThat(String.format("Expected configuration to contain connection id: \"%s\".", expectedHostConnConnectionId),
+//					after.getHostConnections()[0].getConnectionId(), equalTo(expectedHostConnConnectionId));
+//
+//			// Change the description, save and reload again to make sure the description changed, but the connection id
+//			// remained the same.
+//			((JSONObject) json.getJSONArray("hostConn").get(0)).put("description", expectedAlteredHostConnDescription);
+//			after.configure(Stapler.getCurrentRequest(), json);
+//
+//			CpwrGlobalConfiguration after2 = new CpwrGlobalConfiguration();
+//			after2.load();
+//
+//			assertThat(
+//					String.format("Expected configuration to contain description: \"%s\".", expectedAlteredHostConnDescription),
+//					after.getHostConnections()[0].getDescription(), equalTo(expectedAlteredHostConnDescription));
+//
+//			assertThat(String.format("Expected configuration to contain connection id: \"%s\".", expectedHostConnConnectionId),
+//					after.getHostConnections()[0].getConnectionId(), equalTo(expectedHostConnConnectionId));
+//		}
+//		catch (Exception e)
+//		{
+//			fail(e.getMessage());
+//		}
+//	}
+
+//	/**
+//	 * Perform a round trip test on the global configuration.
+//	 * 
+//	 * <p>
+//	 * A configuration is created, configured, submitted / saved, and reloaded where the original configuration is compared
+//	 * against the reloaded configuration for equality.
+//	 */
+//	@Test
+//	public void roundTripTest()
+//	{
+//		String expectedHostConnDescription_1 = "HCI Prod";
+//		String expectedHostConnHostPort_1 = "cw01:30947";
+//		String expectedHostConnCodePage_1 = "1047";
+//		String expectedHostConnConnectionId_1 = "1234";
+//
+//		String expectedHostConnDescription_2 = "HCI Dev";
+//		String expectedHostConnHostPort_2 = "cw01:20947";
+//		String expectedHostConnCodePage_2 = "993";
+//		String expectedHostConnConnectionId_2 = "4567";
+//
+//		String expectedTopazCLILocationLinux = "/opt/Compuware/TopazCLI";
+//		String expectedTopazCLILocationWindows = "C:\\Program Files\\Compuware\\Topaz Workbench CLI";
+//
+//		try
+//		{
+//			JSONObject json = new JSONObject();
+//
+//			JSONObject hostConnection = new JSONObject();
+//			hostConnection.put("description", expectedHostConnDescription_1);
+//			hostConnection.put("hostPort", expectedHostConnHostPort_1);
+//			hostConnection.put("codePage", expectedHostConnCodePage_1);
+//			hostConnection.put("connectionId", expectedHostConnConnectionId_1);
+//
+//			JSONArray hostConnections = new JSONArray();
+//			hostConnections.add(hostConnection);
+//
+//			hostConnection = new JSONObject();
+//			hostConnection.put("description", expectedHostConnDescription_2);
+//			hostConnection.put("hostPort", expectedHostConnHostPort_2);
+//			hostConnection.put("codePage", expectedHostConnCodePage_2);
+//			hostConnection.put("connectionId", expectedHostConnConnectionId_2);
+//			hostConnections.add(hostConnection);
+//
+//			json.put("hostConn", hostConnections);
+//
+//			json.put("topazCLILocationWindows", expectedTopazCLILocationWindows);
+//			json.put("topazCLILocationLinux", expectedTopazCLILocationLinux);
+//
+//			CpwrGlobalConfiguration before = new CpwrGlobalConfiguration();
+//			before.configure(Stapler.getCurrentRequest(), json);
+//
+//			CpwrGlobalConfiguration after = new CpwrGlobalConfiguration();
+//			after.load();
+//
+//			assertThat(String.format("Expected configuration to contain description: \"%s\".", expectedHostConnDescription_1),
+//					after.getHostConnections()[0].getDescription(), equalTo(expectedHostConnDescription_1));
+//
+//			assertThat(String.format("Expected configuration to contain host:port: \"%s\".", expectedHostConnHostPort_1),
+//					after.getHostConnections()[0].getHostPort(), equalTo(expectedHostConnHostPort_1));
+//
+//			assertThat(String.format("Expected configuration to contain code page: \"%s\".", expectedHostConnCodePage_1),
+//					after.getHostConnections()[0].getCodePage(), equalTo(expectedHostConnCodePage_1));
+//
+//			assertThat(
+//					String.format("Expected configuration to contain connection id: \"%s\".", expectedHostConnConnectionId_1),
+//					after.getHostConnections()[0].getConnectionId(), equalTo(expectedHostConnConnectionId_1));
+//
+//			assertThat(String.format("Expected configuration to contain description: \"%s\".", expectedHostConnDescription_2),
+//					after.getHostConnections()[1].getDescription(), equalTo(expectedHostConnDescription_2));
+//
+//			assertThat(String.format("Expected configuration to contain host:port: \"%s\".", expectedHostConnHostPort_2),
+//					after.getHostConnections()[1].getHostPort(), equalTo(expectedHostConnHostPort_2));
+//
+//			assertThat(String.format("Expected configuration to contain code page: \"%s\".", expectedHostConnCodePage_2),
+//					after.getHostConnections()[1].getCodePage(), equalTo(expectedHostConnCodePage_2));
+//
+//			assertThat(
+//					String.format("Expected configuration to contain connection id: \"%s\".", expectedHostConnConnectionId_2),
+//					after.getHostConnections()[1].getConnectionId(), equalTo(expectedHostConnConnectionId_2));
+//
+//			assertThat(
+//					String.format("Expected configuration to contain Topaz CLI location Windows: \"%s\".",
+//							expectedTopazCLILocationWindows),
+//					after.getTopazCLILocationWindows(), equalTo(expectedTopazCLILocationWindows));
+//
+//			assertThat(
+//					String.format("Expected configuration to contain Topaz CLI location Linux: \"%s\".",
+//							expectedTopazCLILocationLinux),
+//					after.getTopazCLILocationLinux(), equalTo(expectedTopazCLILocationLinux));
+//		}
+//		catch (Exception e)
+//		{
+//			fail(e.getMessage());
+//		}
+//	}
+
 	/**
 	 * Test launcher
 	 */
