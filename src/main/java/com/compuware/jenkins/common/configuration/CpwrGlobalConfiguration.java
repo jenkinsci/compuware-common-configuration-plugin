@@ -47,10 +47,12 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	private static final String CODE_PAGE_MAPPINGS = "com.compuware.jenkins.common.configuration.codePageMappings"; //$NON-NLS-1$
 	/** Host connection instance ID defined in config.jelly */
 	private static final String HOST_CONN_INSTANCE_ID = "hostConn"; //$NON-NLS-1$
-	private static final String DESCRIPTION_ID = "description"; //$NON-NLS-1$
-	private static final String HOST_PORT_ID = "hostPort"; //$NON-NLS-1$
-	private static final String CODE_PAGE_ID = "codePage"; //$NON-NLS-1$
-	private static final String CONNECTION_ID = "connectionId"; //$NON-NLS-1$
+	// TODO (pfhjyg0) : keep for now; might be needed in configure() below if unable to get StaplerRequest instance for unit
+	// testing
+	// private static final String DESCRIPTION_ID = "description"; //$NON-NLS-1$
+	// private static final String HOST_PORT_ID = "hostPort"; //$NON-NLS-1$
+	// private static final String CODE_PAGE_ID = "codePage"; //$NON-NLS-1$
+	// private static final String CONNECTION_ID = "connectionId"; //$NON-NLS-1$
 	private static final String TOPAZ_CLI_LOCATION_WINDOWS_ID = "topazCLILocationWindows"; //$NON-NLS-1$
 	private static final String TOPAZ_CLI_LOCATION_LINUX_ID = "topazCLILocationLinux"; //$NON-NLS-1$
 
@@ -144,6 +146,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	{
 		List<HostConnection> list = req.bindJSONToList(HostConnection.class, json.get(HOST_CONN_INSTANCE_ID));
 
+		// TODO (pfhjyg0) : ...still looking at getting a StaplerRequest instance when performing unit testing, so keep for now.
 		// JSONArray hostConnectionsJson = json.getJSONArray(HOST_CONN_INSTANCE_ID);
 		// List<HostConnection> list = new ArrayList<HostConnection>();
 		// for (Object obj : hostConnectionsJson)
