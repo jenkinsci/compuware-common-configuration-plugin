@@ -90,6 +90,7 @@ public class CpwrGlobalConfigurationTest
 		String expectedHostConnDescription = "HCI Prod";
 		String expectedHostConnHostPort = "cw01:30947";
 		String expectedHostConnCodePage = "1047";
+		String expectedHostConnTimeout = "0";
 		String expectedHostConnConnectionId = "9876";
 
 		String expectedTopazCLILocationLinux = "/opt/Compuware/TopazCLI";
@@ -103,6 +104,7 @@ public class CpwrGlobalConfigurationTest
 			hostConnection.put("description", expectedHostConnDescription);
 			hostConnection.put("hostPort", expectedHostConnHostPort);
 			hostConnection.put("codePage", expectedHostConnCodePage);
+			hostConnection.put("timeout", expectedHostConnTimeout);
 			hostConnection.put("connectionId", expectedHostConnConnectionId);
 
 			JSONArray hostConnections = new JSONArray();
@@ -155,11 +157,13 @@ public class CpwrGlobalConfigurationTest
 		String expectedHostConnDescription_1 = "HCI Prod";
 		String expectedHostConnHostPort_1 = "cw01:30947";
 		String expectedHostConnCodePage_1 = "1047";
+		String expectedHostConnTimeout_1 = "0";
 		String expectedHostConnConnectionId_1 = "1234";
 
 		String expectedHostConnDescription_2 = "HCI Dev";
 		String expectedHostConnHostPort_2 = "cw01:20947";
 		String expectedHostConnCodePage_2 = "993";
+		String expectedHostConnTimeout_2 = "10";
 		String expectedHostConnConnectionId_2 = "4567";
 
 		String expectedTopazCLILocationLinux = "/opt/Compuware/TopazCLI";
@@ -173,6 +177,7 @@ public class CpwrGlobalConfigurationTest
 			hostConnection.put("description", expectedHostConnDescription_1);
 			hostConnection.put("hostPort", expectedHostConnHostPort_1);
 			hostConnection.put("codePage", expectedHostConnCodePage_1);
+			hostConnection.put("timeout", expectedHostConnTimeout_1);
 			hostConnection.put("connectionId", expectedHostConnConnectionId_1);
 
 			JSONArray hostConnections = new JSONArray();
@@ -182,6 +187,7 @@ public class CpwrGlobalConfigurationTest
 			hostConnection.put("description", expectedHostConnDescription_2);
 			hostConnection.put("hostPort", expectedHostConnHostPort_2);
 			hostConnection.put("codePage", expectedHostConnCodePage_2);
+			hostConnection.put("timeout", expectedHostConnTimeout_2);
 			hostConnection.put("connectionId", expectedHostConnConnectionId_2);
 			hostConnections.add(hostConnection);
 
@@ -205,6 +211,9 @@ public class CpwrGlobalConfigurationTest
 			assertThat(String.format("Expected configuration to contain code page: \"%s\".", expectedHostConnCodePage_1),
 					after.getHostConnections()[0].getCodePage(), equalTo(expectedHostConnCodePage_1));
 
+			assertThat(String.format("Expected configuration to contain timeout: \"%s\".", expectedHostConnTimeout_1),
+					after.getHostConnections()[0].getTimeout(), equalTo(expectedHostConnTimeout_1));
+
 			assertThat(
 					String.format("Expected configuration to contain connection id: \"%s\".", expectedHostConnConnectionId_1),
 					after.getHostConnections()[0].getConnectionId(), equalTo(expectedHostConnConnectionId_1));
@@ -217,6 +226,9 @@ public class CpwrGlobalConfigurationTest
 
 			assertThat(String.format("Expected configuration to contain code page: \"%s\".", expectedHostConnCodePage_2),
 					after.getHostConnections()[1].getCodePage(), equalTo(expectedHostConnCodePage_2));
+
+			assertThat(String.format("Expected configuration to contain timeout: \"%s\".", expectedHostConnTimeout_2),
+					after.getHostConnections()[1].getTimeout(), equalTo(expectedHostConnTimeout_2));
 
 			assertThat(
 					String.format("Expected configuration to contain connection id: \"%s\".", expectedHostConnConnectionId_2),
