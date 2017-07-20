@@ -51,6 +51,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	private static final String DESCRIPTION_ID = "description"; //$NON-NLS-1$
 	private static final String HOST_PORT_ID = "hostPort"; //$NON-NLS-1$
 	private static final String CODE_PAGE_ID = "codePage"; //$NON-NLS-1$
+	private static final String TIMEOUT_ID = "timeout"; //$NON-NLS-1$
 	private static final String CONNECTION_ID = "connectionId"; //$NON-NLS-1$
 	private static final String TOPAZ_CLI_LOCATION_WINDOWS_ID = "topazCLILocationWindows"; //$NON-NLS-1$
 	private static final String TOPAZ_CLI_LOCATION_LINUX_ID = "topazCLILocationLinux"; //$NON-NLS-1$
@@ -89,12 +90,14 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	public HostConnection[] getHostConnections()
 	{
 		HostConnection[] hostConnections = new HostConnection[m_hostConnections.length];
+
 		for (int i = 0; i < m_hostConnections.length; i++)
 		{
 			hostConnections[i] = new HostConnection(m_hostConnections[i].getDescription(),
 					m_hostConnections[i].getHostPort(), m_hostConnections[i].getCodePage(),
-					m_hostConnections[i].getConnectionId());
+					m_hostConnections[i].getTimeout(), m_hostConnections[i].getConnectionId());
 		}
+
 		return hostConnections;
 	}
 
@@ -162,7 +165,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 				JSONObject jsonHostConnection = jsonHostConnections.getJSONObject(i);
 				hostConnectionArray[i] = new HostConnection(jsonHostConnection.getString(DESCRIPTION_ID),
 						jsonHostConnection.getString(HOST_PORT_ID), jsonHostConnection.getString(CODE_PAGE_ID),
-						jsonHostConnection.getString(CONNECTION_ID));
+						jsonHostConnection.getString(TIMEOUT_ID), jsonHostConnection.getString(CONNECTION_ID));
 			}
 		}
 
