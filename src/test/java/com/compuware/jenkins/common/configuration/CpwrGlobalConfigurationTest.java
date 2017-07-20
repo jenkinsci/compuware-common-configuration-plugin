@@ -51,6 +51,8 @@ public class CpwrGlobalConfigurationTest
 	private static final String EXPECTED_CODE_PAGE_993 = "993";
 	private static final String EXPECTED_CONNECTION_ID = "9876";
 	private static final String EXPECTED_CONNECTION_ID_2 = "4567";
+	private static final String EXPECTED_TIMEOUT_0 = "0";
+	private static final String EXPECTED_TIMEOUT_10 = "10";
 	private static final String EXPECTED_TOPAZ_CLI_LOCATION_LINUX = "/opt/Compuware/TopazCLI";
 	private static final String EXPECTED_TOPAZ_CLI_LOCATION_WINDOWS = "C:\\Program Files\\Compuware\\Topaz Workbench CLI";
 
@@ -103,6 +105,7 @@ public class CpwrGlobalConfigurationTest
 			hostConnection.put("description", EXPECTED_CONNECTION_DESCRIPTION_HCI_PROD);
 			hostConnection.put("hostPort", EXPECTED_HOST_CW01 + ':' + EXPECTED_PORT_30947);
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_1047);
+			hostConnection.put("timeout", EXPECTED_TIMEOUT_0);
 			hostConnection.put("connectionId", EXPECTED_CONNECTION_ID);
 
 			JSONArray hostConnections = new JSONArray();
@@ -165,6 +168,7 @@ public class CpwrGlobalConfigurationTest
 			hostConnection.put("hostPort", expectedHostPortStr1);
 
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_1047);
+			hostConnection.put("timeout", EXPECTED_TIMEOUT_0);
 			hostConnection.put("connectionId", EXPECTED_CONNECTION_ID);
 
 			JSONArray hostConnections = new JSONArray();
@@ -177,6 +181,7 @@ public class CpwrGlobalConfigurationTest
 			hostConnection.put("hostPort", expectedHostPortStr2);
 
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_993);
+			hostConnection.put("timeout", EXPECTED_TIMEOUT_10);
 			hostConnection.put("connectionId", EXPECTED_CONNECTION_ID_2);
 			hostConnections.add(hostConnection);
 
@@ -207,6 +212,9 @@ public class CpwrGlobalConfigurationTest
 
 			assertThat(String.format("Expected configuration to contain code page: \"%s\".", EXPECTED_CODE_PAGE_1047),
 					after.getHostConnections()[0].getCodePage(), equalTo(EXPECTED_CODE_PAGE_1047));
+					
+			assertThat(String.format("Expected configuration to contain timeout: \"%s\".", EXPECTED_TIMEOUT_0),
+					after.getHostConnections()[0].getTimeout(), equalTo(EXPECTED_TIMEOUT_0));
 
 			assertThat(String.format("Expected configuration to contain connection id: \"%s\".", EXPECTED_CONNECTION_ID),
 					after.getHostConnections()[0].getConnectionId(), equalTo(EXPECTED_CONNECTION_ID));
@@ -227,6 +235,9 @@ public class CpwrGlobalConfigurationTest
 
 			assertThat(String.format("Expected configuration to contain code page: \"%s\".", EXPECTED_CODE_PAGE_993),
 					after.getHostConnections()[1].getCodePage(), equalTo(EXPECTED_CODE_PAGE_993));
+					
+			assertThat(String.format("Expected configuration to contain timeout: \"%s\".", EXPECTED_TIMEOUT_10),
+					after.getHostConnections()[1].getTimeout(), equalTo(EXPECTED_TIMEOUT_10));
 
 			assertThat(String.format("Expected configuration to contain connection id: \"%s\".", EXPECTED_CONNECTION_ID_2),
 					after.getHostConnections()[1].getConnectionId(), equalTo(EXPECTED_CONNECTION_ID_2));
