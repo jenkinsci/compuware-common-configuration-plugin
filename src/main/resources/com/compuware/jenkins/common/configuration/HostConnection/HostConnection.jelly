@@ -4,14 +4,14 @@
 		<f:entry title="${%description}" field="description" >
 	    	<f:textbox value="${hostConn.getDescription()}" checkUrl="'${rootURL}/descriptorByName/HostConnection/checkDescription?value='+this.value"/>
 	    </f:entry>
-	    <f:entry title="${%hostPort}" field="hostPort" help="help-hostPort.html">
+	    <f:entry title="${%hostPort}" field="hostPort" help="/plugin/compuware-common-configuration/help-hostPort.html">
 	        <f:textbox value="${hostConn.getHostPort()}" checkUrl="'${rootURL}/descriptorByName/HostConnection/checkHostPort?value='+this.value"/>
 	    </f:entry>
-	    <f:entry title="${%codePage}" field="codePage" help="help-codePage.html">
-	        <f:select default="1047" value="${hostConn.getCodePage()}"/>
+	    <f:entry title="${%codePage}" field="codePage" help="/plugin/compuware-common-configuration/help-codePage.html">
+	        <f:select value="${hostConn.getCodePage()}" default="1047"/>
 	    </f:entry>
-	    <f:entry title="${%timeout}" field="timeout" help="help-timeout.html">
-	        <f:select default="0" value="${hostConn.getTimeout()}" checkUrl="'${rootURL}/descriptorByName/HostConnection/checkTimeout?value='+this.value"/>
+	    <f:entry title="${%timeout}" field="timeout" help="/plugin/compuware-common-configuration/help-timeout.html">
+	        <f:textbox value="${hostConn.getTimeout()}" checkUrl="'${rootURL}/descriptorByName/HostConnection/checkTimeout?value='+this.value"/>
 	    </f:entry>
 	    <f:invisibleEntry>
 	    	<f:textbox field="connectionId" value="${hostConn.getConnectionId()}"/>

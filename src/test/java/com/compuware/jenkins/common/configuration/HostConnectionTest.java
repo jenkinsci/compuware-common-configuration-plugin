@@ -159,15 +159,25 @@ public class HostConnectionTest
 		expectedMsg = Messages.checkTimeoutError();
 		validateTimeoutErrorMessage("Expecting invalid timeout message for a non-numeric value.", input, expectedMsg);
 
+		// decimal timeout
+		input = "1.5";
+		expectedMsg = Messages.checkTimeoutError();
+		validateTimeoutErrorMessage("Expecting invalid timeout message for a decimal value.", input, expectedMsg);
+
 		// too-large timeout
 		input = String.valueOf(Long.MAX_VALUE);
 		expectedMsg = Messages.checkTimeoutError();
 		validateTimeoutErrorMessage("Expecting invalid timeout message for too large of a value.", input, expectedMsg);
 
+		// no timeout
+		input = "";
+		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckTimeout(input);
+		assertEquals("Expecting valid timeout when nothing is specified.", validation.kind, Kind.OK);
+
 		// valid timeout
 		input = "10";
-		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckTimeout(input);
-		assertEquals("Expecting valid timeout.", validation.kind, Kind.OK);
+		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckTimeout(input);
+		assertEquals("Expecting valid timeout when a whole, positive integer is specfied.", validation.kind, Kind.OK);
 	}
 
 	/**

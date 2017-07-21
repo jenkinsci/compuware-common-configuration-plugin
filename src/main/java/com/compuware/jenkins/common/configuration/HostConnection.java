@@ -116,12 +116,14 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 
 	/**
 	 * Returns this connection's read/write timeout.
+	 * <p>
+	 * If the user did not specify a timeout, the default of 0 is returned.
 	 * 
 	 * @return <code>String</code> timeout
 	 */
 	public String getTimeout()
 	{
-		return m_timeout;
+		return StringUtils.isBlank(m_timeout) ? "0" : m_timeout; //$NON-NLS-1$
 	}
 
 	/**
