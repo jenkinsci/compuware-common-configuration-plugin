@@ -210,7 +210,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	 * @param launcher
 	 *            launcher for starting a process
 	 * 
-	 * @return the <code>String</code> CLI location
+	 * @return the CLI location
 	 */
 	public String getTopazCLILocation(Launcher launcher)
 	{
@@ -288,7 +288,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		{
 			if (matcher.matches(c))
 			{
-				credentials = (StandardUsernamePasswordCredentials) c;
+				credentials = c;
 			}
 		}
 
