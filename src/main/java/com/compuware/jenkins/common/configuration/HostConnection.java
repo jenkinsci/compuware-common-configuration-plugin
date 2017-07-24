@@ -61,7 +61,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	/**
 	 * Returns this connection's description.
 	 * 
-	 * @return <code>String</code> description
+	 * @return the description
 	 */
 	public String getDescription()
 	{
@@ -73,7 +73,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 * <p>
 	 * The format is "host:port".
 	 * 
-	 * @return <code>String</code> host/port
+	 * @return the host/port
 	 */
 	public String getHostPort()
 	{
@@ -83,7 +83,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	/**
 	 * Returns this connection's host.
 	 * 
-	 * @return <code>String</code> host
+	 * @return the host
 	 */
 	public String getHost()
 	{
@@ -93,7 +93,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	/**
 	 * Returns this connection's port.
 	 * 
-	 * @return <code>String</code> port
+	 * @return the port
 	 */
 	public String getPort()
 	{
@@ -103,7 +103,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	/**
 	 * Returns this connection's code page.
 	 * 
-	 * @return <code>String</code> code page
+	 * @return the code page
 	 */
 	public String getCodePage()
 	{
@@ -113,7 +113,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	/**
 	 * Returns this connection's unique identifier.
 	 * 
-	 * @return <code>String</code> identifier
+	 * @return the unique identifier
 	 */
 	public String getConnectionId()
 	{
