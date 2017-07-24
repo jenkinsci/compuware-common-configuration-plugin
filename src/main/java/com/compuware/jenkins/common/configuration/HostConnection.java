@@ -31,6 +31,7 @@ import hudson.util.FormValidation;
  */
 public class HostConnection extends AbstractDescribableImpl<HostConnection>
 {
+	// Member Variables
 	private final String m_description;
 	private final String m_hostPort;
 	private final String m_codePage;
@@ -58,9 +59,9 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	}
 
 	/**
-	 * Gets the value of the host description.
+	 * Returns this connection's description.
 	 * 
-	 * @return <code>String</code> value of m_description
+	 * @return the description
 	 */
 	public String getDescription()
 	{
@@ -68,9 +69,11 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	}
 
 	/**
-	 * Gets the value of the 'Host:Port'.
+	 * Returns this connection's host and port.
+	 * <p>
+	 * The format is "host:port".
 	 * 
-	 * @return <code>String</code> value of m_hostport
+	 * @return the host/port
 	 */
 	public String getHostPort()
 	{
@@ -78,9 +81,29 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	}
 
 	/**
-	 * Gets the value of the 'Code Page'.
+	 * Returns this connection's host.
 	 * 
-	 * @return <code>String</code> value of m_codePage
+	 * @return the host
+	 */
+	public String getHost()
+	{
+		return StringUtils.substringBefore(getHostPort(), Constants.COLON);
+	}
+
+	/**
+	 * Returns this connection's port.
+	 * 
+	 * @return the port
+	 */
+	public String getPort()
+	{
+		return StringUtils.substringAfter(getHostPort(), Constants.COLON);
+	}
+
+	/**
+	 * Returns this connection's code page.
+	 * 
+	 * @return the code page
 	 */
 	public String getCodePage()
 	{
@@ -88,9 +111,9 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	}
 
 	/**
-	 * Gets the generated connection identifier.
+	 * Returns this connection's unique identifier.
 	 * 
-	 * @return <code>String</code> generated connection identifier
+	 * @return the unique identifier
 	 */
 	public String getConnectionId()
 	{
@@ -98,19 +121,24 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	}
 
 	/**
-	 * Returns either the unique id or a generated new unique id if the supplied id is missing.
+	 * Generates and returns a unique identifier for this connection.
+	 * <p>
+	 * If the supplied identifier is null or empty, then a unique identifier is generated.
 	 *
 	 * @param id
-	 *            the unique identifier.
-	 * @return either the unique id or a generated new unique id if the supplied id is missing.
+	 *            the unique identifier
+	 * 
+	 * @return a unique identifier
 	 */
 	public static String generateId(String id)
 	{
 		String generatedId = id;
+
 		if (StringUtils.isEmpty(generatedId))
 		{
 			generatedId = UUID.randomUUID().toString();
 		}
+
 		return generatedId;
 	}
 
@@ -133,14 +161,15 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 		 * Constructor.
 		 *
 		 * @param clazz
-		 *            The concrete <code>HostCredentials</code> class.
+		 *            the concrete <code>HostCredentials</code> class
 		 */
 		public DescriptorImpl(Class<? extends HostConnection> clazz)
 		{
 			super(clazz);
 		}
 
-		/* (non-Javadoc)
+		/* 
+		 * (non-Javadoc)
 		 * @see hudson.model.Descriptor#getDisplayName()
 		 */
 		@Override
@@ -207,6 +236,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 		 *            the host value
 		 * @param port
 		 *            the port value
+		 * 
 		 * @return validation message
 		 */
 		private FormValidation validateHostPort(String host, String port)
@@ -225,6 +255,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 			{
 				result = FormValidation.error(Messages.checkHostPortInvalidPortError());
 			}
+
 			return result;
 		}
 

@@ -23,10 +23,16 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import org.kohsuke.stapler.StaplerRequest;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.cloudbees.plugins.credentials.matchers.IdMatcher;
 import com.compuware.jenkins.common.utils.NumericStringComparator;
 import hudson.CopyOnWrite;
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.model.Item;
+import hudson.security.ACL;
 import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
 import net.sf.json.JSONArray;
@@ -38,29 +44,28 @@ import net.sf.json.JSONObject;
 @Extension
 public class CpwrGlobalConfiguration extends GlobalConfiguration
 {
+	// Constants
 	private static final String CODE_PAGE_MAPPINGS = "com.compuware.jenkins.common.configuration.codePageMappings"; //$NON-NLS-1$
-
-	// Host connection instance ID defined in config.jelly
+	/** Host connection instance ID defined in config.jelly */
 	private static final String HOST_CONN_INSTANCE_ID = "hostConn"; //$NON-NLS-1$
-	
-// TODO (pfhjyg0) : keep for now; might be needed in configure() below if unable to get StaplerRequest instance for unit testing
 	private static final String DESCRIPTION_ID = "description"; //$NON-NLS-1$
 	private static final String HOST_PORT_ID = "hostPort"; //$NON-NLS-1$
 	private static final String CODE_PAGE_ID = "codePage"; //$NON-NLS-1$
 	private static final String CONNECTION_ID = "connectionId"; //$NON-NLS-1$
-// TODO (pfhjyg0) END
 	private static final String TOPAZ_CLI_LOCATION_WINDOWS_ID = "topazCLILocationWindows"; //$NON-NLS-1$
 	private static final String TOPAZ_CLI_LOCATION_LINUX_ID = "topazCLILocationLinux"; //$NON-NLS-1$
 
+	// Member Variables
 	@CopyOnWrite
 	private volatile HostConnection[] m_hostConnections = new HostConnection[0];
-
 	private String m_topazCLILocationWindows;
 	private String m_topazCLILocationLinux;
 
     /**
-     * @return the Jenkins managed singleton for the configuration object 
-     */ 
+	 * Returns the singleton instance.
+	 * 
+	 * @return the Jenkins managed singleton for the configuration object
+	 */ 
     public static CpwrGlobalConfiguration get() 
     { 
         return GlobalConfiguration.all().get(CpwrGlobalConfiguration.class); 
@@ -68,6 +73,8 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 
 	/**
 	 * Constructor.
+	 * <p>
+	 * Clients should not call this - use {@link #get()} instead.
 	 */
 	public CpwrGlobalConfiguration()
 	{
@@ -75,7 +82,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Get the list of host connections.
+	 * Returns the list of host connections.
 	 * 
 	 * @return list of host connections
 	 */
@@ -92,19 +99,26 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Get a host connection for the current host connection unique identifier
+	 * Returns a host connection for the given connection identifier.
 	 * 
-	 * @param connectionId a unique connection identifier
+	 * @param connectionId
+	 *            a unique connection identifier
+	 * 
 	 * @return a <code>HostConnection</code>; can be null
 	 */
 	public HostConnection getHostConnection(String connectionId)
 	{
 		HostConnection hostConnection = null;
-		for (HostConnection connection : m_hostConnections)
+
+		if (connectionId != null)
 		{
-			if (connectionId != null && connectionId.matches(connection.getConnectionId()))
+			for (HostConnection connection : m_hostConnections)
 			{
-				hostConnection = connection;
+				if (connectionId.equalsIgnoreCase(connection.getConnectionId()))
+				{
+					hostConnection = connection;
+					break;
+				}
 			}
 		}
 
@@ -112,7 +126,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Set host connections.
+	 * Sets the list of host connections.
 	 * 
 	 * @param connections
 	 *            one or more host connections
@@ -122,34 +136,37 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		m_hostConnections = connections;
 	}
 
-	/* (non-Javadoc)
+	/* 
+	 * (non-Javadoc)
 	 * @see hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject)
 	 */
 	@Override
 	public boolean configure(StaplerRequest req, JSONObject json)
 	{
-		List<HostConnection> list = null;
-		
-// TODO (pfhjyg0) : ...still looking at getting a StaplerRequest instance when performing unit testing, so keep for now.
-		if (req == null)
+		HostConnection[] hostConnectionArray;
+		Object jsonValue = json.get(HOST_CONN_INSTANCE_ID);
+
+		if (req != null)
 		{
-			JSONArray hostConnectionsJson = json.getJSONArray(HOST_CONN_INSTANCE_ID);
-			list = new ArrayList<HostConnection>();
-			for (Object obj : hostConnectionsJson)
-			{
-				JSONObject hostConnectionJson = (JSONObject) obj;
-				list.add(
-						new HostConnection(hostConnectionJson.getString(DESCRIPTION_ID), hostConnectionJson.getString(HOST_PORT_ID),
-								hostConnectionJson.getString(CODE_PAGE_ID), hostConnectionJson.getString(CONNECTION_ID)));
-			}
+			List<HostConnection> hostConnectionList = req.bindJSONToList(HostConnection.class, jsonValue);
+			hostConnectionArray = new HostConnection[hostConnectionList.size()];
+			hostConnectionArray = hostConnectionList.toArray(hostConnectionArray);
 		}
 		else
 		{
-			list = req.bindJSONToList(HostConnection.class, json.get(HOST_CONN_INSTANCE_ID));
+			JSONArray jsonHostConnections = JSONArray.fromObject(jsonValue);
+			hostConnectionArray = new HostConnection[jsonHostConnections.size()];
+			
+			for (int i = 0; i < jsonHostConnections.size(); i++)
+			{
+				JSONObject jsonHostConnection = jsonHostConnections.getJSONObject(i);
+				hostConnectionArray[i] = new HostConnection(jsonHostConnection.getString(DESCRIPTION_ID),
+						jsonHostConnection.getString(HOST_PORT_ID), jsonHostConnection.getString(CODE_PAGE_ID),
+						jsonHostConnection.getString(CONNECTION_ID));
+			}
 		}
-// TODO (pfhjyg0) END		
 
-		setHostConnections(list.toArray(new HostConnection[list.size()]));
+		setHostConnections(hostConnectionArray);
 
 		m_topazCLILocationWindows = json.getString(TOPAZ_CLI_LOCATION_WINDOWS_ID);
 		m_topazCLILocationLinux = json.getString(TOPAZ_CLI_LOCATION_LINUX_ID);
@@ -188,11 +205,12 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Returns the Topaz Workbench CLI location based on node
+	 * Returns the Topaz Workbench CLI location based on node.
 	 * 
 	 * @param launcher
 	 *            launcher for starting a process
-	 * @return CLI location
+	 * 
+	 * @return the CLI location
 	 */
 	public String getTopazCLILocation(Launcher launcher)
 	{
@@ -227,7 +245,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Set the Topaz CLI installation location for Windows systems.
+	 * Sets the Topaz CLI installation location for Windows systems.
 	 * 
 	 * @param location
 	 *            the install directory
@@ -238,7 +256,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Set the Topaz CLI installation location for Linux systems.
+	 * Sets the Topaz CLI installation location for Linux systems.
 	 * 
 	 * @param location
 	 *            the install directory
@@ -246,5 +264,34 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	public void setTopazCLILocationLinux(String location)
 	{
 		m_topazCLILocationLinux = location;
+	}
+
+	/**
+	 * Retrieves login information given a credentials identifier.
+	 * 
+	 * @param project
+	 *            the Jenkins project
+	 * @param credentialsId
+	 *            the <code>String</code> identifier of the credentials to obtain
+	 *
+	 * @return credentials with login information
+	 */
+	public StandardUsernamePasswordCredentials getLoginInformation(Item project, String credentialsId)
+	{
+		StandardUsernamePasswordCredentials credentials = null;
+
+		List<StandardUsernamePasswordCredentials> credentialsList = CredentialsProvider.lookupCredentials(
+				StandardUsernamePasswordCredentials.class, project, ACL.SYSTEM, Collections.<DomainRequirement> emptyList());
+
+		IdMatcher matcher = new IdMatcher(credentialsId);
+		for (StandardUsernamePasswordCredentials c : credentialsList)
+		{
+			if (matcher.matches(c))
+			{
+				credentials = c;
+			}
+		}
+
+		return credentials;
 	}
 }
