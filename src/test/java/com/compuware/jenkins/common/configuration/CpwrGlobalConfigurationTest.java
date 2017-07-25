@@ -100,8 +100,8 @@ public class CpwrGlobalConfigurationTest
 		try
 		{
 			JSONObject json = new JSONObject();
-
 			JSONObject hostConnection = new JSONObject();
+
 			hostConnection.put("description", EXPECTED_CONNECTION_DESCRIPTION_HCI_PROD);
 			hostConnection.put("hostPort", EXPECTED_HOST_CW01 + ':' + EXPECTED_PORT_30947);
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_1047);
@@ -112,7 +112,6 @@ public class CpwrGlobalConfigurationTest
 			hostConnections.add(hostConnection);
 
 			json.put("hostConn", hostConnections);
-
 			json.put("topazCLILocationWindows", EXPECTED_TOPAZ_CLI_LOCATION_WINDOWS);
 			json.put("topazCLILocationLinux", EXPECTED_TOPAZ_CLI_LOCATION_LINUX);
 
@@ -163,10 +162,8 @@ public class CpwrGlobalConfigurationTest
 
 			JSONObject hostConnection = new JSONObject();
 			hostConnection.put("description", EXPECTED_CONNECTION_DESCRIPTION_HCI_PROD);
-
 			String expectedHostPortStr1 = EXPECTED_HOST_CW01 + ':' + EXPECTED_PORT_30947;
 			hostConnection.put("hostPort", expectedHostPortStr1);
-
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_1047);
 			hostConnection.put("timeout", EXPECTED_TIMEOUT_0);
 			hostConnection.put("connectionId", EXPECTED_CONNECTION_ID);
@@ -179,14 +176,13 @@ public class CpwrGlobalConfigurationTest
 
 			String expectedHostPortStr2 = EXPECTED_HOST_CW01 + ':' + EXPECTED_PORT_20947;
 			hostConnection.put("hostPort", expectedHostPortStr2);
-
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_993);
 			hostConnection.put("timeout", EXPECTED_TIMEOUT_10);
 			hostConnection.put("connectionId", EXPECTED_CONNECTION_ID_2);
+
 			hostConnections.add(hostConnection);
 
 			json.put("hostConn", hostConnections);
-
 			json.put("topazCLILocationWindows", EXPECTED_TOPAZ_CLI_LOCATION_WINDOWS);
 			json.put("topazCLILocationLinux", EXPECTED_TOPAZ_CLI_LOCATION_LINUX);
 
