@@ -20,7 +20,7 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import com.compuware.jenkins.common.utils.Constants;
+import com.compuware.jenkins.common.utils.CommonConstants;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -87,7 +87,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 */
 	public String getHost()
 	{
-		return StringUtils.substringBefore(getHostPort(), Constants.COLON);
+		return StringUtils.substringBefore(getHostPort(), CommonConstants.COLON);
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 */
 	public String getPort()
 	{
-		return StringUtils.substringAfter(getHostPort(), Constants.COLON);
+		return StringUtils.substringAfter(getHostPort(), CommonConstants.COLON);
 	}
 
 	/**
@@ -197,7 +197,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 			}
 			else
 			{
-				String[] hostPortParts = StringUtils.split(tempValue, Constants.COLON);
+				String[] hostPortParts = StringUtils.split(tempValue, CommonConstants.COLON);
 				if (hostPortParts.length == 2)
 				{
 					String host = StringUtils.trimToEmpty(hostPortParts[0]);
@@ -210,7 +210,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 				}
 				else
 				{
-					int index = tempValue.indexOf(Constants.COLON);
+					int index = tempValue.indexOf(CommonConstants.COLON);
 					if (index == -1)
 					{
 						result = FormValidation.error(Messages.checkHostPortFormatError());
