@@ -208,7 +208,7 @@ public class CpwrGlobalConfigurationTest
 
 			assertThat(String.format("Expected configuration to contain code page: \"%s\".", EXPECTED_CODE_PAGE_1047),
 					after.getHostConnections()[0].getCodePage(), equalTo(EXPECTED_CODE_PAGE_1047));
-					
+
 			assertThat(String.format("Expected configuration to contain timeout: \"%s\".", EXPECTED_TIMEOUT_0),
 					after.getHostConnections()[0].getTimeout(), equalTo(EXPECTED_TIMEOUT_0));
 
@@ -231,7 +231,7 @@ public class CpwrGlobalConfigurationTest
 
 			assertThat(String.format("Expected configuration to contain code page: \"%s\".", EXPECTED_CODE_PAGE_993),
 					after.getHostConnections()[1].getCodePage(), equalTo(EXPECTED_CODE_PAGE_993));
-					
+
 			assertThat(String.format("Expected configuration to contain timeout: \"%s\".", EXPECTED_TIMEOUT_10),
 					after.getHostConnections()[1].getTimeout(), equalTo(EXPECTED_TIMEOUT_10));
 
