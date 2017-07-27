@@ -41,11 +41,11 @@ public class HostConnectionTest
 	@Before
 	public void setUp()
 	{
-		m_globalHostConnectionConfig = new HostConnection("test", "cw01:1234", "1047", "1");
+		m_globalHostConnectionConfig = new HostConnection("test", "cw01:1234", "1047", "0", "1");
 	}
 
 	/**
-	 * The the host port definition.
+	 * Test the host port definition.
 	 */
 	@Test
 	public void hostPortTest()
@@ -90,7 +90,7 @@ public class HostConnectionTest
 	 * Validate the host port error messages.
 	 * 
 	 * @param msg
-	 *            the msg to be displayed if the tests fails.
+	 *            the msg to be displayed if the tests fails
 	 * @param input
 	 *            the input value for the host port
 	 * @param expectedMsg
@@ -117,8 +117,7 @@ public class HostConnectionTest
 		validateConnectionNameErrorMessage("Expecting empty connection name message.", input, expectedMsg);
 
 		input = "abc:1234";
-		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor())
-				.doCheckDescription(input);
+		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckDescription(input);
 		assertEquals("Expecting valid connection name.", validation.kind, Kind.OK);
 	}
 
@@ -126,7 +125,7 @@ public class HostConnectionTest
 	 * Validate the host connection name error messages.
 	 * 
 	 * @param msg
-	 *            the msg to be displayed if the tests fails.
+	 *            the msg to be displayed if the tests fails
 	 * @param input
 	 *            the input value for the host connection name
 	 * @param expectedMsg
@@ -135,8 +134,63 @@ public class HostConnectionTest
 	private void validateConnectionNameErrorMessage(String msg, String input, String expectedMsg)
 			throws IOException, ServletException
 	{
-		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor())
-				.doCheckDescription(input);
+		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckDescription(input);
+		String actualMsg = validation.getMessage();
+		System.out.println("Expected: " + expectedMsg);
+		System.out.println("Actual  : " + expectedMsg);
+		assertEquals(msg, expectedMsg, actualMsg);
+	}
+
+	/**
+	 * The timeout definition.
+	 */
+	@Test
+	public void timeoutTest()
+	{
+		// negative timeout
+		String input = "-10";
+		String expectedMsg = Messages.checkTimeoutError();
+		validateTimeoutErrorMessage("Expecting invalid timeout message for a negative value.", input, expectedMsg);
+
+		// non-numeric timeout
+		input = "abcd";
+		expectedMsg = Messages.checkTimeoutError();
+		validateTimeoutErrorMessage("Expecting invalid timeout message for a non-numeric value.", input, expectedMsg);
+
+		// decimal timeout
+		input = "1.5";
+		expectedMsg = Messages.checkTimeoutError();
+		validateTimeoutErrorMessage("Expecting invalid timeout message for a decimal value.", input, expectedMsg);
+
+		// too-large timeout
+		input = String.valueOf(Long.MAX_VALUE);
+		expectedMsg = Messages.checkTimeoutError();
+		validateTimeoutErrorMessage("Expecting invalid timeout message for too large of a value.", input, expectedMsg);
+
+		// no timeout
+		input = "";
+		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckTimeout(input);
+		assertEquals("Expecting valid timeout when nothing is specified.", validation.kind, Kind.OK);
+
+		// valid timeout
+		input = "10";
+		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckTimeout(input);
+		assertEquals("Expecting valid timeout when a whole, positive integer is specfied.", validation.kind, Kind.OK);
+	}
+
+	/**
+	 * Validate the timeout error messages.
+	 * 
+	 * @param msg
+	 *            the msg to be displayed if the tests fails
+	 * @param input
+	 *            the input value for the timeout
+	 * @param expectedMsg
+	 *            the expected error message
+	 */
+	private void validateTimeoutErrorMessage(String msg, String input, String expectedMsg)
+	{
+		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckTimeout(input);
 		String actualMsg = validation.getMessage();
 		System.out.println("Expected: " + expectedMsg);
 		System.out.println("Actual  : " + expectedMsg);
