@@ -117,8 +117,7 @@ public class HostConnectionTest
 		validateConnectionNameErrorMessage("Expecting empty connection name message.", input, expectedMsg);
 
 		input = "abc:1234";
-		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor())
-				.doCheckDescription(input);
+		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckDescription(input);
 		assertEquals("Expecting valid connection name.", validation.kind, Kind.OK);
 	}
 
@@ -135,8 +134,7 @@ public class HostConnectionTest
 	private void validateConnectionNameErrorMessage(String msg, String input, String expectedMsg)
 			throws IOException, ServletException
 	{
-		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor())
-				.doCheckDescription(input);
+		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckDescription(input);
 		String actualMsg = validation.getMessage();
 		System.out.println("Expected: " + expectedMsg);
 		System.out.println("Actual  : " + expectedMsg);
