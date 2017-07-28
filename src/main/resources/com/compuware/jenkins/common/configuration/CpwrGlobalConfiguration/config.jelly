@@ -1,11 +1,10 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">         
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">         
 	<f:section title="${%title}">
-    	<f:entry title="${%topazWbCliDirectoryWindows}" field="topazCLILocationWindows">
+    	<f:entry title="${%topazWbCliDirectoryWindows}" field="topazCLILocationWindows" help="/plugin/compuware-common-configuration/help-topazCLILocationWindows.html">
         	<f:textbox name="topazCLILocationWindows" default="C:\Program Files\Compuware\Topaz Workbench CLI"/>
       	</f:entry>
-      	<f:entry title="${%topazWbCliDirectoryLinux}" field="topazCLILocationLinux">
+      	<f:entry title="${%topazWbCliDirectoryLinux}" field="topazCLILocationLinux" help="/plugin/compuware-common-configuration/help-topazCLILocationLinux.html">
         	<f:textbox name="topazCLILocationLinux" default="/opt/Compuware/TopazCLI"/>
 	  	</f:entry>
       	<f:entry title="${%hostConnections}" description="${%hostConnectionsDescr}">

@@ -35,6 +35,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	private final String m_description;
 	private final String m_hostPort;
 	private final String m_codePage;
+	private final String m_timeout;
 	private final String m_connectionId;
 
 	/**
@@ -46,15 +47,18 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 *            the host:port
 	 * @param codePage
 	 *            the code page to be used for the host connection
+	 * @param timeout
+	 *            the read/write timeout to honor on the host connection
 	 * @param connectionId
 	 *            a unique identifier
 	 */
 	@DataBoundConstructor
-	public HostConnection(String description, String hostPort, String codePage, String connectionId)
+	public HostConnection(String description, String hostPort, String codePage, String timeout, String connectionId)
 	{
 		m_description = StringUtils.trimToEmpty(description);
 		m_hostPort = StringUtils.trimToEmpty(hostPort);
 		m_codePage = StringUtils.trimToEmpty(codePage);
+		m_timeout = StringUtils.trimToEmpty(timeout);
 		m_connectionId = generateId(connectionId);
 	}
 
@@ -108,6 +112,18 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	public String getCodePage()
 	{
 		return m_codePage;
+	}
+
+	/**
+	 * Returns this connection's read/write timeout.
+	 * <p>
+	 * If the user did not specify a timeout, the default of 0 is returned.
+	 * 
+	 * @return <code>String</code> timeout
+	 */
+	public String getTimeout()
+	{
+		return StringUtils.isBlank(m_timeout) ? "0" : m_timeout; //$NON-NLS-1$
 	}
 
 	/**
@@ -273,6 +289,39 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 			if (tempValue.isEmpty())
 			{
 				return FormValidation.error(Messages.checkDescriptionEmptyError());
+			}
+
+			return FormValidation.ok();
+		}
+
+		/**
+		 * Validation for the host timeout text field.
+		 * 
+		 * @param value
+		 *            value passed from the config.jelly "timeout" field
+		 * 
+		 * @return validation message
+		 */
+		public FormValidation doCheckTimeout(@QueryParameter String value)
+		{
+			String tempValue = StringUtils.trimToEmpty(value);
+			if (!tempValue.isEmpty())
+			{
+				if (!StringUtils.isNumeric(tempValue))
+				{
+					return FormValidation.error(Messages.checkTimeoutError());
+				}
+				else
+				{
+					try
+					{
+						Integer.parseInt(tempValue);
+					}
+					catch (NumberFormatException e)
+					{
+						return FormValidation.error(Messages.checkTimeoutError());
+					}
+				}
 			}
 
 			return FormValidation.ok();
