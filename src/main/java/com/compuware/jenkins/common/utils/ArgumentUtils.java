@@ -38,45 +38,72 @@ public class ArgumentUtils
 	/**
 	 * Returns an escaped version of the given input String for a Batch or Shell script.
 	 * <p>
+	 * For comma-delimited path Strings, use {@link #escapeCommaDelimitedPathsForScript(String, boolean)} instead as this method
+	 * does not account for the possibility of the user surrounding each path with double quotes.
+	 * <p>
 	 * If the input String is null/empty or does not require escaping, it is returned unchanged.
 	 * 
 	 * @param input
 	 *            the <code>String</code> to escape
-	 * @param isShell
-	 *            <code>true</code> if the script is a Shell script, <code>false</code> if it is a Batch script
 	 * 
 	 * @return the escaped <code>String</code>
 	 */
-	public static String escapeForScript(String input, boolean isShell)
+	public static String escapeForScript(String input)
 	{
 		String output = input;
 
 		if (StringUtils.isNotEmpty(input))
 		{
-			// escape any double quotes (") with another double quote (") for both Batch and Shell scripts
+			// escape any double quote (") with another double quote (")
 			output = StringUtils.replace(input, CommonConstants.DOUBLE_QUOTE, CommonConstants.DOUBLE_QUOTE_ESCAPED);
 
-			// wrap the input in quotes for Batch scripts
-			if (!isShell)
-			{
-				output = wrapInQuotes(output);
-			}
+			// wrap the input in double quotes
+			output = wrapInDoubleQuotes(output);
 		}
 
 		return output;
 	}
 
 	/**
-	 * Wraps the given input String in quotes.
+	 * Returns an escaped version of the given comma-delmited paths input String for a Batch or Shell script.
 	 * <p>
-	 * If the input String is null/empty or is already wrapped in quotes, it is returned unchanged.
+	 * This method accounts for the possibility of the user surrounding each path in the input String with double quotes. For
+	 * all other Strings, use {@link #escapeForScript(String, boolean)} instead.
+	 * <p>
+	 * If the input String is null/empty or does not require escaping, it is returned unchanged.
 	 * 
 	 * @param input
-	 *            the <code>String</code> to wrap in quotes
+	 *            the comma-delimited paths <code>String</code> to escape
 	 * 
-	 * @return the quoted <code>String</code>
+	 * @return the escaped <code>String</code>
 	 */
-	public static String wrapInQuotes(String input)
+	public static String escapeCommaDelimitedPathsForScript(String input)
+	{
+		String output = input;
+
+		if (StringUtils.isNotEmpty(input))
+		{
+			// remove all double quotes from the path
+			output = StringUtils.remove(input, CommonConstants.DOUBLE_QUOTE);
+
+			// wrap the input in double quotes
+			output = wrapInDoubleQuotes(output);
+		}
+
+		return output;
+	}
+
+	/**
+	 * Wraps the given input String in double quotes.
+	 * <p>
+	 * If the input String is null/empty or is already wrapped in double quotes, it is returned unchanged.
+	 * 
+	 * @param input
+	 *            the <code>String</code> to wrap in double quotes
+	 * 
+	 * @return the double-quoted <code>String</code>
+	 */
+	public static String wrapInDoubleQuotes(String input)
 	{
 		String output = input;
 
