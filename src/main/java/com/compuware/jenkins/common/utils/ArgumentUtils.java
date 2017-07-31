@@ -38,8 +38,8 @@ public class ArgumentUtils
 	/**
 	 * Returns an escaped version of the given input String for a Batch or Shell script.
 	 * <p>
-	 * For comma-delimited path Strings, use {@link #escapeCommaDelimitedPathsForScript(String, boolean)} instead as this method
-	 * does not account for the possibility of the user surrounding each path with double quotes.
+	 * For comma-delimited path Strings, use {@link #escapeCommaDelimitedPathsForScript(String)} instead as this method does not
+	 * account for the possibility of the user surrounding each path with double quotes.
 	 * <p>
 	 * If the input String is null/empty or does not require escaping, it is returned unchanged.
 	 * 
@@ -68,7 +68,7 @@ public class ArgumentUtils
 	 * Returns an escaped version of the given comma-delmited paths input String for a Batch or Shell script.
 	 * <p>
 	 * This method accounts for the possibility of the user surrounding each path in the input String with double quotes. For
-	 * all other Strings, use {@link #escapeForScript(String, boolean)} instead.
+	 * all other Strings, use {@link #escapeForScript(String)} instead.
 	 * <p>
 	 * If the input String is null/empty or does not require escaping, it is returned unchanged.
 	 * 

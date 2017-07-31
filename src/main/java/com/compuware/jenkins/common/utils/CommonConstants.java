@@ -42,7 +42,7 @@ public class CommonConstants
 	public static final String PORT_PARM = "-port";
 	public static final String USERID_PARM = "-id";
 	public static final String TARGET_FOLDER_PARM = "-targetFolder";
-	public static final String TIMEOUT_PARM = "timeout";
+	public static final String TIMEOUT_PARM = "-timeout";
 	public static final String TOPAZ_CLI_WORKSPACE = "TopazCliWkspc";
 
 	public static final String COLON = ":";
