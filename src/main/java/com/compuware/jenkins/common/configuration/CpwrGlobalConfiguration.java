@@ -17,16 +17,19 @@
 package com.compuware.jenkins.common.configuration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.matchers.IdMatcher;
+import com.compuware.jenkins.common.utils.CommonConstants;
 import com.compuware.jenkins.common.utils.NumericStringComparator;
 import hudson.CopyOnWrite;
 import hudson.Extension;
@@ -137,6 +140,45 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	public void setHostConnections(HostConnection... connections)
 	{
 		m_hostConnections = connections;
+	}
+
+	/**
+	 * Returns true if given host:port and code page exists as a known host connection.
+	 * 
+	 * @param hostPort
+	 *            the host and port in the form of 'host:port'
+	 * @param codePage
+	 *            the code page
+	 * 
+	 * @return true if given host:port and code page exists as a known host connection; otherwise false
+	 */
+	public boolean hostConnectionExists(String hostPort, String codePage)
+	{
+		String host = StringUtils.substringBefore(hostPort, CommonConstants.COLON);
+		String port = StringUtils.substringAfter(hostPort, CommonConstants.COLON);
+		for (HostConnection connection : m_hostConnections)
+		{
+			if (connection.getHost().equalsIgnoreCase(host) && connection.getPort().equalsIgnoreCase(port)
+					&& connection.getCodePage().equalsIgnoreCase(codePage))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Adds the given host connection to the list of host connections.
+	 * 
+	 * @param connection
+	 *            connection to add
+	 */
+	public void addHostConnection(HostConnection connection)
+	{
+		List<HostConnection> newConnectionsList = new ArrayList<>(Arrays.asList(m_hostConnections));
+		newConnectionsList.add(connection);
+		setHostConnections(newConnectionsList.toArray(new HostConnection[newConnectionsList.size()]));		
 	}
 
 	/* 
