@@ -1,0 +1,16 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+	<style type="text/css">
+		select.host-select { max-width: 33%; vertical-align:top; }
+		a.configure { padding: 0px 0px 0px 15px; }
+	</style>
+	
+	<f:prepareDatabinding/>
+	
+	<div class="host-selection-control">
+		<f:select clazz="${attrs.clazz} host-select" field="${attrs.field}" value="${attrs.value}" default="${attrs.default}" />
+    	<a class="configure" href="/configure#cpwr-config">Manage connections</a>
+    </div>
+    
+</j:jelly>
