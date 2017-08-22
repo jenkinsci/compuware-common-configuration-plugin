@@ -81,7 +81,7 @@ public class CLIVersionUtils
 	{
 		String version = "";
 		
-		FilePath versionFilePath = cliDirectory.child(CommonConstants.SLASH + CommonConstants.VERSION_FILE);
+		FilePath versionFilePath = cliDirectory.child(cliDirectory.getRemote() + CommonConstants.SLASH + CommonConstants.VERSION_FILE);
 		
 		if (!versionFilePath.exists())
 		{
