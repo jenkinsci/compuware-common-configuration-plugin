@@ -44,12 +44,14 @@ public class CommonConstants
 	public static final String TARGET_FOLDER_PARM = "-targetFolder";
 	public static final String TIMEOUT_PARM = "-timeout";
 	public static final String TOPAZ_CLI_WORKSPACE = "TopazCliWkspc";
+	public static final String VERSION_FILE = "version.xml";
 
 	public static final String COLON = ":";
 	public static final String COMMA = ",";
 	public static final String DASH = "-";
 	public static final String LINE_RETURN = "\n";
 	public static final String SPACE = " ";
+	public static final String SLASH = "/";
 
 	public static final String BACKSLASH = "\\";
 	public static final String BACKSLASH_ESCAPED = "\\\\";
