@@ -85,7 +85,7 @@ public class CLIVersionUtilsTest
 		Mockito.when(installPath.exists()).thenReturn(true);
 		Mockito.when(versionFilePath.exists()).thenReturn(false);
 		
-		Mockito.when(installPath.child(CommonConstants.SLASH + CommonConstants.VERSION_FILE)).thenReturn(versionFilePath);
+		Mockito.when(installPath.child(installPath.getRemote() + CommonConstants.SLASH + CommonConstants.VERSION_FILE)).thenReturn(versionFilePath);
 		
 		try
 		{
@@ -105,7 +105,7 @@ public class CLIVersionUtilsTest
 		
 		Mockito.when(installPath.exists()).thenReturn(true);
 		Mockito.when(versionFilePath.exists()).thenReturn(true);
-		Mockito.when(installPath.child(CommonConstants.SLASH + CommonConstants.VERSION_FILE)).thenReturn(versionFilePath);
+		Mockito.when(installPath.child(installPath.getRemote() + CommonConstants.SLASH + CommonConstants.VERSION_FILE)).thenReturn(versionFilePath);
 		
 		try
 		{	
