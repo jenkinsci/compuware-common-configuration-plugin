@@ -33,8 +33,10 @@ import com.compuware.jenkins.common.configuration.Messages;
 
 import hudson.AbortException;
 import hudson.FilePath;
-import hudson.remoting.VirtualChannel;
 
+/**
+ *	Utility class used to check the version of the installed Topaz CLI.
+ */
 public class CLIVersionUtils
 {
 	/**
@@ -47,23 +49,24 @@ public class CLIVersionUtils
 	}
 	
 	/**
+	 * Checks if the version of the installed Topaz CLI is greater or equal to the Jenkins plugins
+	 * required version. This will abort the Jenkins job if CLI is not compatible.
 	 * 
-	 * @param vChannel
-	 * @param topazCliPath
+	 * @param cliDirectory
+	 * 		FilePath of the Topaz CLI install directory
 	 * @param minimumVersion
+	 * 		Minimum required CLI version of the Jenkins plugin
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public static void checkCLICompatibility(VirtualChannel vChannel, String topazCliPath, String minimumVersion) throws IOException, InterruptedException
-	{
-		FilePath cliDirectory = new FilePath(vChannel, topazCliPath);
-		
+	public static void checkCLICompatibility(FilePath cliDirectory, String minimumVersion) throws IOException, InterruptedException
+	{	
 		if (!cliDirectory.exists())
 		{
 			throw new AbortException(Messages.cliNotInstalledError());
 		}
 		
-		String version = getCLIVersion(vChannel, topazCliPath, minimumVersion);
+		String version = getCLIVersion(cliDirectory, minimumVersion);
 		
 		if (compareVersions(version, minimumVersion) != 0)
 		{
@@ -71,20 +74,14 @@ public class CLIVersionUtils
 		}
 	}
 	
-	/**
-	 * 
-	 * @param vChannel
-	 * @param topazCliPath
-	 * @param minimumVersion
-	 * @return
-	 * @throws IOException
-	 * @throws InterruptedException
+	/*
+	 * 	Reads the version.xml file from the CLI directory and gets the version number
 	 */
-	private static String getCLIVersion(VirtualChannel vChannel, String topazCliPath, String minimumVersion) throws IOException, InterruptedException
+	private static String getCLIVersion(FilePath cliDirectory, String minimumVersion) throws IOException, InterruptedException
 	{
 		String version = "";
 		
-		FilePath versionFilePath = new FilePath(vChannel, topazCliPath + CommonConstants.SLASH + CommonConstants.VERSION_FILE);
+		FilePath versionFilePath = cliDirectory.child(CommonConstants.SLASH + CommonConstants.VERSION_FILE);
 		
 		if (!versionFilePath.exists())
 		{
@@ -96,33 +93,24 @@ public class CLIVersionUtils
 		return version;
 	}
 	
-	/**
-	 * 
-	 * 
-	 * @param cliVersion
-	 * @param minimumVersion
-	 * @return
-	 * 		0 if the CLI version is greater or equal to the minimum required version.
-	 * 		1 if the CLI version is less than the minimum required version, or no version file found.
+	/*
+	 * 	Compares the CLI version with the plugins required version
 	 */
 	private static int compareVersions(String cliVersion, String minimumVersion)
 	{
-		int cliVersionNum = Integer.parseInt(cliVersion.replaceAll("\\.", ""));
-		int minimumVersionNum = Integer.parseInt(minimumVersion.replaceAll("\\.", ""));
-		
 		if (cliVersion.equalsIgnoreCase(""))
 		{
 			return 1;
 		}
 		
+		int cliVersionNum = Integer.parseInt(cliVersion.replaceAll("\\.", ""));
+		int minimumVersionNum = Integer.parseInt(minimumVersion.replaceAll("\\.", ""));
+		
 		return (cliVersionNum < minimumVersionNum) ? 1 : 0;
 	}
 	
-	/**
-	 * 
-	 * @param versionfile
-	 * @return
-	 * @throws IOException
+	/*
+	 * 	Parses the version.xml and converts "version" attribute to a version number
 	 */
 	private static String parseXml(InputStream versionfile) throws IOException
 	{
