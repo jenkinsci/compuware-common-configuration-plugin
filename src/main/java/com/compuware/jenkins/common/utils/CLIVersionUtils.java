@@ -21,16 +21,12 @@ package com.compuware.jenkins.common.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-
 import com.compuware.jenkins.common.configuration.Messages;
-
 import hudson.AbortException;
 import hudson.FilePath;
 
@@ -79,7 +75,7 @@ public class CLIVersionUtils
 	 */
 	private static String getCLIVersion(FilePath cliDirectory, String minimumVersion) throws IOException, InterruptedException
 	{
-		String version = "";
+		String version = ""; //$NON-NLS-1$
 		
 		FilePath versionFilePath = cliDirectory.child(cliDirectory.getRemote() + CommonConstants.SLASH + CommonConstants.VERSION_FILE);
 		
@@ -98,13 +94,13 @@ public class CLIVersionUtils
 	 */
 	private static int compareVersions(String cliVersion, String minimumVersion)
 	{
-		if (cliVersion.equalsIgnoreCase(""))
+		if (cliVersion.equalsIgnoreCase("")) //$NON-NLS-1$
 		{
 			return 1;
 		}
 		
-		int cliVersionNum = Integer.parseInt(cliVersion.replaceAll("\\.", ""));
-		int minimumVersionNum = Integer.parseInt(minimumVersion.replaceAll("\\.", ""));
+		int cliVersionNum = Integer.parseInt(cliVersion.replaceAll("\\.", "")); //$NON-NLS-1$//$NON-NLS-2$
+		int minimumVersionNum = Integer.parseInt(minimumVersion.replaceAll("\\.", "")); //$NON-NLS-1$//$NON-NLS-2$
 		
 		return (cliVersionNum < minimumVersionNum) ? 1 : 0;
 	}
@@ -114,7 +110,7 @@ public class CLIVersionUtils
 	 */
 	private static String parseXml(InputStream versionfile) throws IOException
 	{
-		String version = "";
+		String version = ""; //$NON-NLS-1$
 		
 		try
 		{
@@ -122,7 +118,7 @@ public class CLIVersionUtils
 		    DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		    Document document = dBuilder.parse(versionfile);
 		    
-		    version = document.getDocumentElement().getAttribute("version");
+			version = document.getDocumentElement().getAttribute("version"); //$NON-NLS-1$
 		}
 		catch (ParserConfigurationException | SAXException e)
 		{
