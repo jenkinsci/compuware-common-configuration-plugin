@@ -91,7 +91,7 @@ public class CLIVersionUtilsTest
 		}
 		catch (AbortException e)
 		{
-			assertEquals(Messages.cliOldVersionError(CLI_VERSION), e.getMessage());
+			assertEquals(Messages.cliOldUnknownVersionError(CLI_VERSION), e.getMessage());
 		}
 	}
 	
@@ -127,7 +127,7 @@ public class CLIVersionUtilsTest
 		
 		String oldVersionXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 		oldVersionXml += "<product name=\"Compuware Topaz\" version=\"0.1.0\" build=\"188\"/>";
-		testXmlAbortException(oldVersionXml, installPath, versionFilePath, CLI_VERSION);
+		testXmlAbortException(oldVersionXml, installPath, versionFilePath, CLI_VERSION, "0.1.0");
 
 		String emptyVersionXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 		emptyVersionXml += "<product name=\"Compuware Topaz\" version=\"\" build=\"188\"/>";	
@@ -167,7 +167,24 @@ public class CLIVersionUtilsTest
 		}
 		catch (AbortException e)
 		{
-			assertEquals(Messages.cliOldVersionError(version), e.getMessage());
+			assertEquals(Messages.cliOldUnknownVersionError(version), e.getMessage());
+		}
+	}
+
+	private void testXmlAbortException(String xml, FilePath installPath, FilePath versionFilePath, String version,
+			String installedVersion) throws IOException, InterruptedException
+	{
+		try
+		{
+			InputStream inputStream = new ByteArrayInputStream(xml.getBytes());
+			Mockito.when(versionFilePath.read()).thenReturn(inputStream);
+
+			CLIVersionUtils.checkCLICompatibility(installPath, version);
+			fail("Expected an AbortException to occur.");
+		}
+		catch (AbortException e)
+		{
+			assertEquals(Messages.cliOldVersionError(installedVersion, version), e.getMessage());
 		}
 	}
 }
