@@ -21,22 +21,19 @@ package com.compuware.jenkins.common.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.junit.Test;
 import org.mockito.Mockito;
-
 import com.compuware.jenkins.common.configuration.Messages;
-
 import hudson.AbortException;
 import hudson.FilePath;
 
 /**
  *	CLIVersionUtils unit test class.
  */
+@SuppressWarnings("nls")
 public class CLIVersionUtilsTest
 {
 	final String CLI_VERSION = "1.0.0";
