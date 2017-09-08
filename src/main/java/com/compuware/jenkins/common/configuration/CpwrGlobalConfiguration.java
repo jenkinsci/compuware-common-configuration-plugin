@@ -16,6 +16,7 @@
  */
 package com.compuware.jenkins.common.configuration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -34,6 +36,8 @@ import com.compuware.jenkins.common.utils.NumericStringComparator;
 import hudson.CopyOnWrite;
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.init.InitMilestone;
+import hudson.init.Initializer;
 import hudson.model.Item;
 import hudson.security.ACL;
 import hudson.util.ListBoxModel;
@@ -48,6 +52,8 @@ import net.sf.json.JSONObject;
 public class CpwrGlobalConfiguration extends GlobalConfiguration
 {
 	// Constants
+	private static Logger m_logger = Logger.getLogger("hudson.CpwrGlobalConfiguration"); //$NON-NLS-1$
+
 	private static final String CODE_PAGE_MAPPINGS = "com.compuware.jenkins.common.configuration.codePageMappings"; //$NON-NLS-1$
 	/** Host connection instance ID defined in config.jelly */
 	private static final String HOST_CONN_INSTANCE_ID = "hostConn"; //$NON-NLS-1$
@@ -58,12 +64,17 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	private static final String CONNECTION_ID = "connectionId"; //$NON-NLS-1$
 	private static final String TOPAZ_CLI_LOCATION_WINDOWS_ID = "topazCLILocationWindows"; //$NON-NLS-1$
 	private static final String TOPAZ_CLI_LOCATION_LINUX_ID = "topazCLILocationLinux"; //$NON-NLS-1$
+	private static final String DEFAULT_TOPAZ_CLI_LOCATION_WINDOWS = "C:\\Program Files\\Compuware\\Topaz Workbench CLI"; //$NON-NLS-1$
+	private static final String DEFAULT_TOPAZ_CLI_LOCATION_LINUX = "/opt/Compuware/TopazCLI"; //$NON-NLS-1$
 
 	// Member Variables
 	@CopyOnWrite
 	private volatile HostConnection[] m_hostConnections = new HostConnection[0];
-	private String m_topazCLILocationWindows;
-	private String m_topazCLILocationLinux;
+	private String m_topazCLILocationWindows = DEFAULT_TOPAZ_CLI_LOCATION_WINDOWS;
+	private String m_topazCLILocationLinux = DEFAULT_TOPAZ_CLI_LOCATION_LINUX;
+
+	// Used to indicate if the configuration needs saving; used only in the context of migration.
+	protected transient boolean m_needsSaving = false;
 
     /**
 	 * Returns the singleton instance.
@@ -83,6 +94,33 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	public CpwrGlobalConfiguration()
 	{
 		load();
+	}
+
+	/**
+	 * Return TRUE if the configuration needs saving.
+	 * 
+	 * @return TRUE if the configuration needs saving.
+	 */
+	public boolean needsSaving()
+	{
+		return m_needsSaving;
+	}
+
+	/**
+	 * Perform initialization after all jobs have been loaded.
+	 * 
+	 * @throws IOException
+	 */
+	@Initializer(after = InitMilestone.JOB_LOADED)
+	public static void jobLoaded() throws IOException
+	{
+		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
+		if (globalConfig.needsSaving())
+		{
+			globalConfig.save();
+
+			m_logger.info("Compuware global configuration has been saved."); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -143,29 +181,32 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	}
 
 	/**
-	 * Returns true if given host:port and code page exists as a known host connection.
+	 * Returns a host connection for a given host:port and code page, if one exists.
 	 * 
 	 * @param hostPort
 	 *            the host and port in the form of 'host:port'
 	 * @param codePage
 	 *            the code page
 	 * 
-	 * @return true if given host:port and code page exists as a known host connection; otherwise false
+	 * @return a host connection; can be null
 	 */
-	public boolean hostConnectionExists(String hostPort, String codePage)
+	public HostConnection getHostConnection(String hostPort, String codePage)
 	{
+		HostConnection connection = null;
+
 		String host = StringUtils.substringBefore(hostPort, CommonConstants.COLON);
 		String port = StringUtils.substringAfter(hostPort, CommonConstants.COLON);
-		for (HostConnection connection : m_hostConnections)
+		for (HostConnection conn : m_hostConnections)
 		{
-			if (connection.getHost().equalsIgnoreCase(host) && connection.getPort().equalsIgnoreCase(port)
-					&& connection.getCodePage().equalsIgnoreCase(codePage))
+			if (conn.getHost().equalsIgnoreCase(host) && conn.getPort().equalsIgnoreCase(port)
+					&& conn.getCodePage().equalsIgnoreCase(codePage))
 			{
-				return true;
+				connection = conn;
+				break;
 			}
 		}
 
-		return false;
+		return connection;
 	}
 
 	/**
@@ -178,7 +219,8 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	{
 		List<HostConnection> newConnectionsList = new ArrayList<>(Arrays.asList(m_hostConnections));
 		newConnectionsList.add(connection);
-		setHostConnections(newConnectionsList.toArray(new HostConnection[newConnectionsList.size()]));		
+		setHostConnections(newConnectionsList.toArray(new HostConnection[newConnectionsList.size()]));
+		m_needsSaving = true;
 	}
 
 	/* 
