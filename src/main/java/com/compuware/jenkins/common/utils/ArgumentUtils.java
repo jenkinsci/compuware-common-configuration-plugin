@@ -16,7 +16,6 @@
  */
 package com.compuware.jenkins.common.utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
@@ -172,30 +171,27 @@ public class ArgumentUtils
 	}
 	
 	/**
-	 * Resolves the user-entered path into an absolute path.
+	 * Resolves a folder name to an absolute path.
 	 * 
-	 * @param downloadPath
-	 * 		user-entered to download source
+	 * @param folder
+	 *            the name of a folder or an absolute path
 	 * @param workspacePath
-	 * 		absolute path of the project workspace
-	 * @param isUnix
-	 * 		if the download location is on a UNIX based machine
-	 * @return
-	 * 		absolute path of download location
+	 *            absolute path of the project workspace
+	 * @return absolute path of of a folder
 	 */
-	public static String resolvePath(String downloadPath, String workspacePath, boolean isUnix)
+	public static String resolvePath(String folder, String workspacePath)
 	{
-		String targetFolder = downloadPath;
-		Path targetFolderPath = Paths.get(targetFolder);
+		String resolvedFolderPath = folder;
+		Path folderPath = Paths.get(folder);
 		
-		if (!targetFolderPath.isAbsolute())
+		if (!folderPath.isAbsolute())
 		{
-			String separator = isUnix ? CommonConstants.SLASH : CommonConstants.BACKSLASH;		
-			targetFolder = workspacePath + separator + targetFolder;
+			Path absPath = Paths.get(workspacePath, resolvedFolderPath);
+			resolvedFolderPath = absPath.toString();
 		}
 		
-		targetFolder = escapeForScript(targetFolder);
+		resolvedFolderPath = escapeForScript(resolvedFolderPath);
 		
-		return targetFolder;
+		return resolvedFolderPath;
 	}
 }
