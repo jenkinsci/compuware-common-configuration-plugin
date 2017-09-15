@@ -18,6 +18,8 @@ package com.compuware.jenkins.common.utils;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 
@@ -166,5 +168,30 @@ public class ArgumentUtils
 		}
 
 		return properties;
+	}
+	
+	/**
+	 * Resolves a folder name to an absolute path.
+	 * 
+	 * @param folder
+	 *            the name of a folder or an absolute path
+	 * @param workspacePath
+	 *            absolute path of the project workspace
+	 * @return absolute path of of a folder
+	 */
+	public static String resolvePath(String folder, String workspacePath)
+	{
+		String resolvedFolderPath = folder;
+		Path folderPath = Paths.get(folder);
+		
+		if (!folderPath.isAbsolute())
+		{
+			Path absPath = Paths.get(workspacePath, resolvedFolderPath);
+			resolvedFolderPath = absPath.toString();
+		}
+		
+		resolvedFolderPath = escapeForScript(resolvedFolderPath);
+		
+		return resolvedFolderPath;
 	}
 }
