@@ -11,12 +11,10 @@
   </parent>
   <groupId>com.compuware.jenkins</groupId>
   <artifactId>compuware-common-configuration</artifactId>
-  <version>1.0</version>
+  <version>1.0-SNAPSHOT</version>
   <packaging>hpi</packaging>
 
   <properties>
-    <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
-    <!-- <jenkins.version>2.32</jenkins.version> -->
   </properties>
 
   <name>Compuware Common Configuration</name>
