@@ -16,5 +16,17 @@
 	      		</f:repeatable>
       		</div>
     	</f:entry>
+    	<f:entry title="${%cesUrl}" field="cesUrl" help="/plugin/compuware-common-configuration/help-cesUrl.html">     	
+        	<div class="cpwr-ces-url" id="cpwr-ces-url">
+    			<f:textbox value="${instance.cesUrl}" checkUrl="'${rootURL}/descriptorByName/CESConnection/checkCesUrl?value='+this.value"/>
+        	</div> 	
+      	</f:entry>
+    	<f:entry title="${%tokens}" description="${%cesRestApiDescr}">
+      		<div class="cpwr-section-ces-rest-api">
+	      		<f:repeatable var="cesToken" items="${instance.cesTokens}" add="${%addToken}">      
+	      			<st:include page="CESToken.jelly" class="com.compuware.jenkins.common.configuration.CESToken"/>
+	      		</f:repeatable>
+      		</div>
+    	</f:entry>
 	</f:section>
 </j:jelly>

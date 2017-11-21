@@ -1,0 +1,16 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<table width="100%" class="cpwr-ces-token">
+		<f:entry title="${%hostName}" field="hostName" help="/plugin/compuware-common-configuration/help-hostName.html">
+	    	<f:textbox value="${cesToken.getHostName()}" checkUrl="'${rootURL}/descriptorByName/CESToken/checkHostName?value='+this.value"/>
+	    </f:entry>
+	    <f:entry title="${%token}" field="token" help="/plugin/compuware-common-configuration/help-token.html">
+	        <f:textbox value="${cesToken.getToken()}" checkUrl="'${rootURL}/descriptorByName/CESToken/checkToken?value='+this.value"/>
+	    </f:entry>
+	    <f:entry title="">
+	    	<div align="right">
+	        	<f:repeatableDeleteButton value="${%deleteToken}"/>
+	        </div>
+	    </f:entry>
+	</table>
+</j:jelly>
