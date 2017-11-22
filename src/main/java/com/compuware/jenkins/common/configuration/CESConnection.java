@@ -1,5 +1,7 @@
 package com.compuware.jenkins.common.configuration;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -100,16 +102,23 @@ public class CESConnection  extends AbstractDescribableImpl<CESConnection>
 		 */
 		public FormValidation doCheckCesUrl(@QueryParameter String value)
 		{
-			FormValidation result;
+			FormValidation result = FormValidation.ok();
 
 			if (StringUtils.isNotBlank(value))
 			{
-				
-				result = FormValidation.error(Messages.checkCesUrlEmptyError());
-			}
-			else
-			{
-				result = FormValidation.ok();
+				//verify if url is valid
+				if (!value.endsWith("/")) //$NON-NLS-1$
+				{
+					value = value + "/"; //$NON-NLS-1$
+				}
+				try
+				{
+					new URL(value);
+				}
+				catch (MalformedURLException e)
+				{
+					result = FormValidation.error(Messages.checkCesUrlInvalidError());
+				}
 			}
 
 			return result;
