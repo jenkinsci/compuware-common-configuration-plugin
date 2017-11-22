@@ -2,11 +2,9 @@ package com.compuware.jenkins.common.configuration;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-//import org.apache.commons.validator.routines.UrlValidator;
 import org.kohsuke.stapler.QueryParameter;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
