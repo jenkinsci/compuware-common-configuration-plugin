@@ -16,6 +16,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import com.compuware.jenkins.common.utils.CommonConstants;
+import com.compuware.jenkins.common.utils.ValidationUtils;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -157,14 +159,45 @@ public class CESToken extends AbstractDescribableImpl<CESToken>
 		 */
 		public FormValidation doCheckHostName(@QueryParameter String value)
 		{
-			//TODO elaborate checks to verify format too
+			FormValidation result;
+
 			String tempValue = StringUtils.trimToEmpty(value);
-			if (tempValue.isEmpty())
+			if (!tempValue.isEmpty())
 			{
-				return FormValidation.error(Messages.checkHostNameEmptyError());
+				String[] hostPortParts = StringUtils.split(tempValue, CommonConstants.DASH);
+				if (hostPortParts.length == 2)
+				{
+					String host = StringUtils.trimToEmpty(hostPortParts[0]);
+					String port = StringUtils.trimToEmpty(hostPortParts[1]);
+					result = ValidationUtils.validateHostPort(host, port);
+				}
+				else if (hostPortParts.length > 2)
+				{
+					result = FormValidation.error(Messages.checkHostNameFormatError());
+				}
+				else
+				{
+					int index = tempValue.indexOf(CommonConstants.DASH);
+					if (index == -1)
+					{
+						result = FormValidation.error(Messages.checkHostNameFormatError());
+					}
+					else if (index == 0)
+					{
+						result = FormValidation.error(Messages.checkHostPortMissingHostError());
+					}
+					else
+					{
+						result = FormValidation.error(Messages.checkHostPortMissingPortError());
+					}
+				}
 			}
-	
-			return FormValidation.ok();
+			else
+			{
+				result = FormValidation.error(Messages.checkHostNameEmptyError());
+			}
+
+			return result;
 		}
 		
 		/**

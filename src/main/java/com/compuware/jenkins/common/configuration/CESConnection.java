@@ -1,10 +1,11 @@
 package com.compuware.jenkins.common.configuration;
 
+import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+//import org.apache.commons.validator.routines.UrlValidator;
 import org.kohsuke.stapler.QueryParameter;
-import com.compuware.jenkins.common.utils.CommonConstants;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -101,9 +102,9 @@ public class CESConnection  extends AbstractDescribableImpl<CESConnection>
 		{
 			FormValidation result;
 
-			String tempValue = StringUtils.trimToEmpty(value);
-			if (tempValue.isEmpty())
+			if (StringUtils.isNotBlank(value))
 			{
+				
 				result = FormValidation.error(Messages.checkCesUrlEmptyError());
 			}
 			else

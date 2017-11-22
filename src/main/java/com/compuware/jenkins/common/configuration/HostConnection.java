@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import com.compuware.jenkins.common.utils.CommonConstants;
+import com.compuware.jenkins.common.utils.ValidationUtils;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -218,7 +219,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 				{
 					String host = StringUtils.trimToEmpty(hostPortParts[0]);
 					String port = StringUtils.trimToEmpty(hostPortParts[1]);
-					result = validateHostPort(host, port);
+					result =  ValidationUtils.validateHostPort(host, port);
 				}
 				else if (hostPortParts.length > 2)
 				{
@@ -240,36 +241,6 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 						result = FormValidation.error(Messages.checkHostPortMissingPortError());
 					}
 				}
-			}
-
-			return result;
-		}
-
-		/**
-		 * Validation for the host and port.
-		 * 
-		 * @param host
-		 *            the host value
-		 * @param port
-		 *            the port value
-		 * 
-		 * @return validation message
-		 */
-		private FormValidation validateHostPort(String host, String port)
-		{
-			FormValidation result = FormValidation.ok();
-
-			if (host.isEmpty())
-			{
-				result = FormValidation.error(Messages.checkHostPortMissingHostError());
-			}
-			else if (port.isEmpty())
-			{
-				result = FormValidation.error(Messages.checkHostPortMissingPortError());
-			}
-			else if (!StringUtils.isNumeric(port))
-			{
-				result = FormValidation.error(Messages.checkHostPortInvalidPortError());
 			}
 
 			return result;
