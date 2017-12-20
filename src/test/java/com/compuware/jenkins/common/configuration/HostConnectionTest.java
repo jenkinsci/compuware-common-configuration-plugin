@@ -41,7 +41,7 @@ public class HostConnectionTest
 	@Before
 	public void setUp()
 	{
-		m_globalHostConnectionConfig = new HostConnection("test", "cw01:1234", "1047", "0", "1");
+		m_globalHostConnectionConfig = new HostConnection("test", "cw01:1234", "1047", "0", "1", "2");
 	}
 
 	/**
@@ -195,5 +195,34 @@ public class HostConnectionTest
 		System.out.println("Expected: " + expectedMsg);
 		System.out.println("Actual  : " + expectedMsg);
 		assertEquals(msg, expectedMsg, actualMsg);
+	}
+	
+	/**
+	 * Test the ces url.
+	 */
+	@Test
+	public void checkCesUrlTest()
+	{
+		//test invalid URLs
+		String input = "badurl";
+		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckCesUrl(input);
+		assertEquals(FormValidation.error(Messages.checkCesUrlInvalidError()).toString(), validation.toString());
+		
+		input = "www.myurl.combadurl";
+		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckCesUrl(input);
+		assertEquals(FormValidation.error(Messages.checkCesUrlInvalidError()).toString(), validation.toString());
+		
+		input = "www.myurl.com";
+		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckCesUrl(input);
+		assertEquals(FormValidation.error(Messages.checkCesUrlInvalidError()).toString(), validation.toString());
+		
+		//test valid URLs
+		input = "https://www.myurl.com/";
+		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckCesUrl(input);
+		assertEquals(FormValidation.ok().toString(), validation.toString());
+		
+		input = "https://myurl.com";
+		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckCesUrl(input);
+		assertEquals(FormValidation.ok().toString(), validation.toString());
 	}
 }

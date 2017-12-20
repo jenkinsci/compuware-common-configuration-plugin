@@ -16,6 +16,8 @@
  */
 package com.compuware.jenkins.common.configuration;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -37,6 +39,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	private final String m_codePage;
 	private final String m_timeout;
 	private final String m_connectionId;
+	private final String m_cesUrl;
 
 	/**
 	 * Constructor.
@@ -51,15 +54,18 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 *            the read/write timeout to honor on the host connection
 	 * @param connectionId
 	 *            a unique identifier
+	 * @param cesUrl
+	 * 			  a CES URL
 	 */
 	@DataBoundConstructor
-	public HostConnection(String description, String hostPort, String codePage, String timeout, String connectionId)
+	public HostConnection(String description, String hostPort, String codePage, String timeout, String connectionId, String cesUrl)
 	{
 		m_description = StringUtils.trimToEmpty(description);
 		m_hostPort = StringUtils.trimToEmpty(hostPort);
 		m_codePage = StringUtils.trimToEmpty(codePage);
 		m_timeout = StringUtils.trimToEmpty(timeout);
 		m_connectionId = generateId(connectionId);
+		m_cesUrl = StringUtils.trimToEmpty(cesUrl);
 	}
 
 	/**
@@ -158,6 +164,16 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 		return generatedId;
 	}
 
+	/**
+	 * Get the CES URL
+	 * 
+	 * @return the CES URL
+	 */
+	public String getCesUrl()
+	{
+		return m_cesUrl;
+	}
+	
 	/**
 	 * DescriptorImpl is used to create instances of <code>CodeCoverageBuilder</code>. It also contains the global configuration
 	 * options as fields, just like the <code>CodeCoverageBuilder</code> contains the configuration options for a job
@@ -325,6 +341,38 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 			}
 
 			return FormValidation.ok();
+		}
+		
+		/**
+		 * Validation for the 'CES URL' text field.
+		 * 
+		 * @param value
+		 *            value passed from the config.jelly "cesUrl" field
+		 * 
+		 * @return validation message
+		 */
+		public FormValidation doCheckCesUrl(@QueryParameter String value)
+		{
+			FormValidation result = FormValidation.ok();
+
+			if (StringUtils.isNotBlank(value))
+			{
+				//verify if url is valid
+				if (!value.endsWith("/")) //$NON-NLS-1$
+				{
+					value = value + "/"; //$NON-NLS-1$
+				}
+				try
+				{
+					new URL(value);
+				}
+				catch (MalformedURLException e)
+				{
+					result = FormValidation.error(Messages.checkCesUrlInvalidError());
+				}
+			}
+
+			return result;
 		}
 	}
 }

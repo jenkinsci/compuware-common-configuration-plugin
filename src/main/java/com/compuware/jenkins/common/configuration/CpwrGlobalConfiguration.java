@@ -20,10 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -64,29 +62,19 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	private static final String CODE_PAGE_ID = "codePage"; //$NON-NLS-1$
 	private static final String TIMEOUT_ID = "timeout"; //$NON-NLS-1$
 	private static final String CONNECTION_ID = "connectionId"; //$NON-NLS-1$
+	private static final String CES_URL_ID = "cesUrl"; //$NON-NLS-1$
 	private static final String TOPAZ_CLI_LOCATION_WINDOWS_ID = "topazCLILocationWindows"; //$NON-NLS-1$
 	private static final String TOPAZ_CLI_LOCATION_LINUX_ID = "topazCLILocationLinux"; //$NON-NLS-1$
 	private static final String DEFAULT_TOPAZ_CLI_LOCATION_WINDOWS = "C:\\Program Files\\Compuware\\Topaz Workbench CLI"; //$NON-NLS-1$
 	private static final String DEFAULT_TOPAZ_CLI_LOCATION_LINUX = "/opt/Compuware/TopazCLI"; //$NON-NLS-1$
-	/** CES URL instance ID defined in config.jelly */
-	private static final String CES_CONN_INSTANCE_ID = "cesConn"; //$NON-NLS-1$
-	/** Token instance ID defined in config.jelly */
-	private static final String TOKEN_INSTANCE_ID = "cesToken"; //$NON-NLS-1$
-	private static final String HOST_NAME_ID = "hostName"; //$NON-NLS-1$
-	private static final String TOKEN_ID = "token"; //$NON-NLS-1$
-	private static final String CES_TOKEN_ID = "tokenId"; //$NON-NLS-1$
-	private static final String CES_URL_ID = "cesUrl"; //$NON-NLS-1$
 	
 	
 	// Member Variables
 	@CopyOnWrite
 	private volatile HostConnection[] m_hostConnections = new HostConnection[0];
-	private volatile CESConnection cesConnection = null;
-	private volatile CESToken[] cesTokens = null;
 	
 	private String m_topazCLILocationWindows = DEFAULT_TOPAZ_CLI_LOCATION_WINDOWS;
 	private String m_topazCLILocationLinux = DEFAULT_TOPAZ_CLI_LOCATION_LINUX;
-	private String cesUrl = StringUtils.EMPTY;
 
 	// Used to indicate if the configuration needs saving; used only in the context of migration.
 	protected transient boolean m_needsSaving = false;
@@ -137,46 +125,6 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 			m_logger.info("Compuware global configuration has been saved."); //$NON-NLS-1$
 		}
 	}
-
- 	/**
-	 * Returns CES connection with its tokens
-	 * 
-	 * @return CES connection
-	 */
-	public CESConnection getCesConnection() {
-//		// a Demo configuration//
-//		List<CESToken> cesTokens = Arrays.asList(
-//				new CESToken("cw09-27623", "8971c96a-35fb-45ba-8cff-b9ba631ae0ba", "1"), 
-//				new CESToken("cw09-47623", "3837ae52-de34-4068-9c2a-3e2ddc7e9fed", "2"));
-//		
-//		CESConnection cesConnection = new CESConnection(
-//				"http://10.211.55.12:48080", cesTokens);
-		CESConnection cesConnection = this.cesConnection;
-		
-		return cesConnection;
-	}
-	
- 	/**
-	 * Returns CES tokens
-	 * 
-	 * @return CES tokens
-	 */
-	public CESToken[] getCesTokens() 
-	{
-		CESToken[] cesTokens = cesConnection.getTokens();
-		return cesTokens;
-	}
-	
- 	/**
-	 * Returns CES URL
-	 * 
-	 * @return CES URL
-	 */
-	public String getCesUrl() 
-	{
-		String cesUrl = cesConnection.getUrl();
-		return cesUrl;
-	}
 	
 	/**
 	 * Returns the list of host connections.
@@ -189,9 +137,13 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 
 		for (int i = 0; i < m_hostConnections.length; i++)
 		{
-			hostConnections[i] = new HostConnection(m_hostConnections[i].getDescription(),
-					m_hostConnections[i].getHostPort(), m_hostConnections[i].getCodePage(),
-					m_hostConnections[i].getTimeout(), m_hostConnections[i].getConnectionId());
+			hostConnections[i] = new HostConnection(
+				m_hostConnections[i].getDescription(),
+				m_hostConnections[i].getHostPort(),
+				m_hostConnections[i].getCodePage(),
+				m_hostConnections[i].getTimeout(),
+				m_hostConnections[i].getConnectionId(),
+				m_hostConnections[i].getCesUrl());
 		}
 
 		return hostConnections;
@@ -233,28 +185,6 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	public void setHostConnections(HostConnection... connections)
 	{
 		m_hostConnections = connections;
-	}
-
-	/**
-	 * Sets the CES connection.
-	 * 
-	 * @param connection
-	 *            the CES connection
-	 */
-	public void setCesConnection(CESConnection connection)
-	{
-		cesConnection = connection;
-	}
-	
-	/**
-	 * Sets the CES tokens
-	 * 
-	 * @param cesTokens the cesTokens to set
-	 */
-	public void setCesTokens(CESToken[] cesTokens)
-	{
-		//TODO don't need this setter because we get the tokens from the CESConnection?
-		this.cesTokens = cesTokens;
 	}
 	
 	/**
@@ -299,23 +229,6 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		setHostConnections(newConnectionsList.toArray(new HostConnection[newConnectionsList.size()]));
 		m_needsSaving = true;
 	}
-
-	/**
-	 * Adds the given token to the list of ces tokens.
-	 * 
-	 * @param token
-	 *            token to add
-	 */
-	public void addToken(CESToken token)
-	{
-		//TODO is this method necessary?
-		List<CESToken> newTokensList = new ArrayList<>(Arrays.asList(cesTokens));
-		newTokensList.add(token);
-		setCesTokens(newTokensList.toArray(new CESToken[newTokensList.size()])); //TODO optional?
-		CESConnection updatedConnection = new CESConnection(cesConnection.getUrl(), newTokensList.toArray(new CESToken[newTokensList.size()]));
-		setCesConnection(updatedConnection);
-		m_needsSaving = true;
-	}
 	
 	/* 
 	 * (non-Javadoc)
@@ -341,9 +254,13 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 			for (int i = 0; i < jsonHostConnections.size(); i++)
 			{
 				JSONObject jsonHostConnection = jsonHostConnections.getJSONObject(i);
-				hostConnectionArray[i] = new HostConnection(jsonHostConnection.getString(DESCRIPTION_ID),
-						jsonHostConnection.getString(HOST_PORT_ID), jsonHostConnection.getString(CODE_PAGE_ID),
-						jsonHostConnection.getString(TIMEOUT_ID), jsonHostConnection.getString(CONNECTION_ID));
+				hostConnectionArray[i] = new HostConnection(
+					jsonHostConnection.getString(DESCRIPTION_ID),
+					jsonHostConnection.getString(HOST_PORT_ID),
+					jsonHostConnection.getString(CODE_PAGE_ID),
+					jsonHostConnection.getString(TIMEOUT_ID),
+					jsonHostConnection.getString(CONNECTION_ID),
+					jsonHostConnection.getString(CES_URL_ID));
 			}
 		}
 
@@ -351,33 +268,6 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 
 		m_topazCLILocationWindows = json.getString(TOPAZ_CLI_LOCATION_WINDOWS_ID);
 		m_topazCLILocationLinux = json.getString(TOPAZ_CLI_LOCATION_LINUX_ID);
-
-		
-		//CES token info
-		CESToken[] cesTokenArray;
-		jsonValue = json.get(TOKEN_INSTANCE_ID);
-		
-		if (req != null)
-		{
-			List<CESToken> cesTokenList = req.bindJSONToList(CESToken.class, jsonValue);
-			cesTokenArray = new CESToken[cesTokenList.size()];
-			cesTokenArray = cesTokenList.toArray(cesTokenArray);
-		}
-		else
-		{
-			JSONArray jsonCESTokens = JSONArray.fromObject(jsonValue);
-			cesTokenArray = new CESToken[jsonCESTokens.size()];
-			
-			for (int i = 0; i < jsonCESTokens.size(); i++)
-			{
-				JSONObject jsonCESToken = jsonCESTokens.getJSONObject(i);
-				cesTokenArray[i] = new CESToken(jsonCESToken.getString(HOST_NAME_ID),
-						jsonCESToken.getString(TOKEN_ID), jsonCESToken.getString(CES_TOKEN_ID));
-			}
-		}
-		
-		CESConnection connection = new CESConnection(json.getString(CES_URL_ID), cesTokenArray);
-		setCesConnection(connection);
 		
 		save();
 
