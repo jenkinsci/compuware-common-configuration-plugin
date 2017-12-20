@@ -51,6 +51,7 @@ public class CpwrGlobalConfigurationTest
 	private static final String EXPECTED_CODE_PAGE_993 = "993";
 	private static final String EXPECTED_CONNECTION_ID = "9876";
 	private static final String EXPECTED_CONNECTION_ID_2 = "4567";
+	private static final String EXPECTED_CES_URL = "https://expectedcesurl/";
 	private static final String EXPECTED_TIMEOUT_0 = "0";
 	private static final String EXPECTED_TIMEOUT_10 = "10";
 	private static final String EXPECTED_TOPAZ_CLI_LOCATION_LINUX = "/opt/Compuware/TopazCLI";
@@ -107,6 +108,7 @@ public class CpwrGlobalConfigurationTest
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_1047);
 			hostConnection.put("timeout", EXPECTED_TIMEOUT_0);
 			hostConnection.put("connectionId", EXPECTED_CONNECTION_ID);
+			hostConnection.put("cesUrl", EXPECTED_CES_URL);
 
 			JSONArray hostConnections = new JSONArray();
 			hostConnections.add(hostConnection);
@@ -167,6 +169,7 @@ public class CpwrGlobalConfigurationTest
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_1047);
 			hostConnection.put("timeout", EXPECTED_TIMEOUT_0);
 			hostConnection.put("connectionId", EXPECTED_CONNECTION_ID);
+			hostConnection.put("cesUrl", EXPECTED_CES_URL);
 
 			JSONArray hostConnections = new JSONArray();
 			hostConnections.add(hostConnection);
@@ -179,6 +182,7 @@ public class CpwrGlobalConfigurationTest
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_993);
 			hostConnection.put("timeout", EXPECTED_TIMEOUT_10);
 			hostConnection.put("connectionId", EXPECTED_CONNECTION_ID_2);
+			hostConnection.put("cesUrl", EXPECTED_CES_URL);
 
 			hostConnections.add(hostConnection);
 
