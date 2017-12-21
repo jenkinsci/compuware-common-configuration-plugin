@@ -173,7 +173,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	{
 		return m_cesUrl;
 	}
-	
+
 	/**
 	 * DescriptorImpl is used to create instances of <code>CodeCoverageBuilder</code>. It also contains the global configuration
 	 * options as fields, just like the <code>CodeCoverageBuilder</code> contains the configuration options for a job
@@ -342,7 +342,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 
 			return FormValidation.ok();
 		}
-		
+
 		/**
 		 * Validation for the 'CES URL' text field.
 		 * 
@@ -357,7 +357,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 
 			if (StringUtils.isNotBlank(value))
 			{
-				//verify if url is valid
+				// verify if url is valid
 				if (!value.endsWith("/")) //$NON-NLS-1$
 				{
 					value = value + "/"; //$NON-NLS-1$

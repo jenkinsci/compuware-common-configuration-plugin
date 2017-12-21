@@ -68,11 +68,10 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	private static final String DEFAULT_TOPAZ_CLI_LOCATION_WINDOWS = "C:\\Program Files\\Compuware\\Topaz Workbench CLI"; //$NON-NLS-1$
 	private static final String DEFAULT_TOPAZ_CLI_LOCATION_LINUX = "/opt/Compuware/TopazCLI"; //$NON-NLS-1$
 	
-	
 	// Member Variables
 	@CopyOnWrite
 	private volatile HostConnection[] m_hostConnections = new HostConnection[0];
-	
+
 	private String m_topazCLILocationWindows = DEFAULT_TOPAZ_CLI_LOCATION_WINDOWS;
 	private String m_topazCLILocationLinux = DEFAULT_TOPAZ_CLI_LOCATION_LINUX;
 
@@ -125,7 +124,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 			m_logger.info("Compuware global configuration has been saved."); //$NON-NLS-1$
 		}
 	}
-	
+
 	/**
 	 * Returns the list of host connections.
 	 * 
@@ -186,7 +185,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	{
 		m_hostConnections = connections;
 	}
-	
+
 	/**
 	 * Returns a host connection for a given host:port and code page, if one exists.
 	 * 
@@ -229,7 +228,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		setHostConnections(newConnectionsList.toArray(new HostConnection[newConnectionsList.size()]));
 		m_needsSaving = true;
 	}
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see hudson.model.Descriptor#configure(org.kohsuke.stapler.StaplerRequest, net.sf.json.JSONObject)
@@ -268,7 +267,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 
 		m_topazCLILocationWindows = json.getString(TOPAZ_CLI_LOCATION_WINDOWS_ID);
 		m_topazCLILocationLinux = json.getString(TOPAZ_CLI_LOCATION_LINUX_ID);
-		
+
 		save();
 
 		return true;
