@@ -13,6 +13,9 @@
 	    <f:entry title="${%timeout}" field="timeout" help="/plugin/compuware-common-configuration/help-timeout.html">
 	        <f:textbox value="${hostConn.getTimeout()}" checkUrl="'${rootURL}/descriptorByName/HostConnection/checkTimeout?value='+this.value"/>
 	    </f:entry>
+	    <f:entry title="${%cesUrl}" field="cesUrl" help="/plugin/compuware-common-configuration/help-cesUrl.html">
+	        <f:textbox value="${hostConn.getCesUrl()}" checkUrl="'${rootURL}/descriptorByName/HostConnection/checkCesUrl?value='+this.value" default=""/>
+	    </f:entry>
 	    <f:invisibleEntry>
 	    	<f:textbox field="connectionId" value="${hostConn.getConnectionId()}"/>
 	    </f:invisibleEntry>
