@@ -10,7 +10,7 @@
   </parent>
   <groupId>com.compuware.jenkins</groupId>
   <artifactId>compuware-common-configuration</artifactId>
-  <version>1.0.5-SNAPSHOT</version>
+  <version>1.0.4-SNAPSHOT</version>
   <packaging>hpi</packaging>
 
   <!-- I think this should be specified now
@@ -34,7 +34,7 @@
 
   <developers>
     <developer>
-      <id>cpwr_jenkins_plugin</id>
+      <id>cpwr_jenkins</id>
       <name>Steve Kansa</name>
       <email>steve.kansa@compuware.com</email>
     </developer>
