@@ -18,7 +18,7 @@
 		- https://wiki.jenkins.io/display/JENKINS/Plugin+tutorial#Plugintutorial-pom.xml
 	-->
   <properties>
-	<jenkins.version>2.60.1</jenkins.version>
+	<jenkins.version>2.32</jenkins.version>
   </properties>
 
   <name>Compuware Common Configuration</name>
