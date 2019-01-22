@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015 - 2018 Compuware Corporation
+ * Copyright (c) 2015 - 2019 Compuware Corporation
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
  * and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -53,8 +53,9 @@ public class CLIVersionUtils
 	 * 		FilePath of the Topaz CLI install directory
 	 * @param minimumVersion
 	 * 		Minimum required CLI version of the Jenkins plugin
-	 * @throws IOException
-	 * @throws InterruptedException
+	 * 
+	 * @throws IOException if an I/O error occurs checking directory existence or getting the CLI version 
+	 * @throws InterruptedException if checking directory existence or getting the CLI version is interrupted by another thread
 	 */
 	public static void checkCLICompatibility(FilePath cliDirectory, String minimumVersion) throws IOException, InterruptedException
 	{	
