@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015 - 2018 Compuware Corporation
+ * Copyright (c) 2015 - 2019 Compuware Corporation
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
@@ -37,6 +37,7 @@ public class CommonConstants
 
 	public static final String CODE_PAGE_PARM = "-code";
 	public static final String DATA_PARM = "-data";
+	public static final String PROTOCOL_PARM = "-protocol";
 	public static final String HOST_PARM = "-host";
 	public static final String PW_PARM = "-pass";
 	public static final String PORT_PARM = "-port";

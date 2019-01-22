@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015 - 2018 Compuware Corporation
+ * Copyright (c) 2015 - 2019 Compuware Corporation
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
@@ -54,6 +54,8 @@ public class CpwrGlobalConfigurationTest
 	private static final String EXPECTED_CES_URL = "https://expectedcesurl/";
 	private static final String EXPECTED_TIMEOUT_0 = "0";
 	private static final String EXPECTED_TIMEOUT_10 = "10";
+	private static final String EXPECTED_PROTOCOL_NONE = "None";
+	private static final String EXPECTED_PROTOCOL_TLS = "TLSv1.2";
 	private static final String EXPECTED_TOPAZ_CLI_LOCATION_LINUX = "/opt/Compuware/TopazCLI";
 	private static final String EXPECTED_TOPAZ_CLI_LOCATION_WINDOWS = "C:\\Program Files\\Compuware\\Topaz Workbench CLI";
 
@@ -105,6 +107,7 @@ public class CpwrGlobalConfigurationTest
 
 			hostConnection.put("description", EXPECTED_CONNECTION_DESCRIPTION_HCI_PROD);
 			hostConnection.put("hostPort", EXPECTED_HOST_CW01 + ':' + EXPECTED_PORT_30947);
+			hostConnection.put("protocol", EXPECTED_PROTOCOL_TLS);
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_1047);
 			hostConnection.put("timeout", EXPECTED_TIMEOUT_0);
 			hostConnection.put("connectionId", EXPECTED_CONNECTION_ID);
@@ -166,6 +169,7 @@ public class CpwrGlobalConfigurationTest
 			hostConnection.put("description", EXPECTED_CONNECTION_DESCRIPTION_HCI_PROD);
 			String expectedHostPortStr1 = EXPECTED_HOST_CW01 + ':' + EXPECTED_PORT_30947;
 			hostConnection.put("hostPort", expectedHostPortStr1);
+			hostConnection.put("protocol", EXPECTED_PROTOCOL_TLS);
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_1047);
 			hostConnection.put("timeout", EXPECTED_TIMEOUT_0);
 			hostConnection.put("connectionId", EXPECTED_CONNECTION_ID);
@@ -179,6 +183,7 @@ public class CpwrGlobalConfigurationTest
 
 			String expectedHostPortStr2 = EXPECTED_HOST_CW01 + ':' + EXPECTED_PORT_20947;
 			hostConnection.put("hostPort", expectedHostPortStr2);
+			hostConnection.put("protocol", EXPECTED_PROTOCOL_NONE);
 			hostConnection.put("codePage", EXPECTED_CODE_PAGE_993);
 			hostConnection.put("timeout", EXPECTED_TIMEOUT_10);
 			hostConnection.put("connectionId", EXPECTED_CONNECTION_ID_2);
@@ -210,6 +215,9 @@ public class CpwrGlobalConfigurationTest
 			assertThat(String.format("Expected configuration to contain host:port: \"%s\".", expectedHostPortStr1),
 					after.getHostConnections()[0].getHostPort(), equalTo(expectedHostPortStr1));
 
+			assertThat(String.format("Expected configuration to contain encryption protocol: \"%s\".", EXPECTED_PROTOCOL_TLS),
+					after.getHostConnections()[0].getProtocol(), equalTo(EXPECTED_PROTOCOL_TLS));
+
 			assertThat(String.format("Expected configuration to contain code page: \"%s\".", EXPECTED_CODE_PAGE_1047),
 					after.getHostConnections()[0].getCodePage(), equalTo(EXPECTED_CODE_PAGE_1047));
 
@@ -232,6 +240,9 @@ public class CpwrGlobalConfigurationTest
 
 			assertThat(String.format("Expected configuration to contain host:port: \"%s\".", expectedHostPortStr2),
 					after.getHostConnections()[1].getHostPort(), equalTo(expectedHostPortStr2));
+
+			assertThat(String.format("Expected configuration to contain encryption protocol: \"%s\".", EXPECTED_PROTOCOL_NONE),
+					after.getHostConnections()[1].getProtocol(), equalTo(EXPECTED_PROTOCOL_NONE));
 
 			assertThat(String.format("Expected configuration to contain code page: \"%s\".", EXPECTED_CODE_PAGE_993),
 					after.getHostConnections()[1].getCodePage(), equalTo(EXPECTED_CODE_PAGE_993));
