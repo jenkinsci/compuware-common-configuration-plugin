@@ -7,6 +7,9 @@
 	    <f:entry title="${%hostPort}" field="hostPort" help="/plugin/compuware-common-configuration/help-hostPort.html">
 	        <f:textbox value="${hostConn.getHostPort()}" checkUrl="'${rootURL}/descriptorByName/HostConnection/checkHostPort?value='+this.value"/>
 	    </f:entry>
+	    <f:entry title="${%protocol}" field="protocol" help="/plugin/compuware-common-configuration/help-protocol.html">
+	        <f:select value="${hostConn.getProtocol()}" default="None"/>
+	    </f:entry>
 	    <f:entry title="${%codePage}" field="codePage" help="/plugin/compuware-common-configuration/help-codePage.html">
 	        <f:select value="${hostConn.getCodePage()}" default="1047"/>
 	    </f:entry>
