@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015 - 2018 Compuware Corporation
+ * Copyright (c) 2015 - 2019 Compuware Corporation
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
@@ -16,23 +16,26 @@
  */
 package com.compuware.jenkins.common.configuration;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
+
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.matchers.IdMatcher;
 import com.compuware.jenkins.common.utils.CommonConstants;
 import com.compuware.jenkins.common.utils.NumericStringComparator;
+
 import hudson.CopyOnWrite;
 import hudson.Extension;
 import hudson.Launcher;
@@ -55,11 +58,13 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	private static Logger m_logger = Logger.getLogger("hudson.CpwrGlobalConfiguration"); //$NON-NLS-1$
 
 	private static final String CODE_PAGE_MAPPINGS = "com.compuware.jenkins.common.configuration.codePageMappings"; //$NON-NLS-1$
+	private static final String PROTOCOL_MAPPINGS = "com.compuware.jenkins.common.configuration.protocolMappings"; //$NON-NLS-1$
 	/** Host connection instance ID defined in config.jelly */
 	private static final String HOST_CONN_INSTANCE_ID = "hostConn"; //$NON-NLS-1$
 	private static final String DESCRIPTION_ID = "description"; //$NON-NLS-1$
 	private static final String HOST_PORT_ID = "hostPort"; //$NON-NLS-1$
 	private static final String CODE_PAGE_ID = "codePage"; //$NON-NLS-1$
+	private static final String PROTOCOL = "protocol"; //$NON-NLS-1$
 	private static final String TIMEOUT_ID = "timeout"; //$NON-NLS-1$
 	private static final String CONNECTION_ID = "connectionId"; //$NON-NLS-1$
 	private static final String CES_URL_ID = "cesUrl"; //$NON-NLS-1$
@@ -67,6 +72,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	private static final String TOPAZ_CLI_LOCATION_LINUX_ID = "topazCLILocationLinux"; //$NON-NLS-1$
 	private static final String DEFAULT_TOPAZ_CLI_LOCATION_WINDOWS = "C:\\Program Files\\Compuware\\Topaz Workbench CLI"; //$NON-NLS-1$
 	private static final String DEFAULT_TOPAZ_CLI_LOCATION_LINUX = "/opt/Compuware/TopazCLI"; //$NON-NLS-1$
+	private static final String PROTOCOL_NONE = "None"; //$NON-NLS-1$
 	
 	// Member Variables
 	@CopyOnWrite
@@ -110,11 +116,9 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 
 	/**
 	 * Perform initialization after all jobs have been loaded.
-	 * 
-	 * @throws IOException
 	 */
 	@Initializer(after = InitMilestone.JOB_LOADED)
-	public static void jobLoaded() throws IOException
+	public static void jobLoaded()
 	{
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
 		if (globalConfig.needsSaving())
@@ -139,6 +143,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 			hostConnections[i] = new HostConnection(
 				m_hostConnections[i].getDescription(),
 				m_hostConnections[i].getHostPort(),
+				m_hostConnections[i].getProtocol(),
 				m_hostConnections[i].getCodePage(),
 				m_hostConnections[i].getTimeout(),
 				m_hostConnections[i].getConnectionId(),
@@ -256,6 +261,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 				hostConnectionArray[i] = new HostConnection(
 					jsonHostConnection.getString(DESCRIPTION_ID),
 					jsonHostConnection.getString(HOST_PORT_ID),
+					jsonHostConnection.getString(PROTOCOL),
 					jsonHostConnection.getString(CODE_PAGE_ID),
 					jsonHostConnection.getString(TIMEOUT_ID),
 					jsonHostConnection.getString(CONNECTION_ID),
@@ -271,6 +277,42 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		save();
 
 		return true;
+	}
+
+	/**
+	 * Fills in the encryption protocol selection box with encryption protocols.
+	 *
+	 * @return encryption protocol selections
+	 */
+	public ListBoxModel doFillProtocolItems()
+	{
+		ListBoxModel protocolModel = new ListBoxModel();
+
+		ResourceBundle cpBundle = ResourceBundle.getBundle(PROTOCOL_MAPPINGS);
+		Set<String> protocolSet = cpBundle.keySet();
+
+		// sort the encryption protocol values (for display purposes)
+		List<String> protocolSetList = new ArrayList<>(protocolSet);
+		Collections.sort(protocolSetList, new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				if (PROTOCOL_NONE.equals(o1) || PROTOCOL_NONE.equals(o2)) {
+					return -1;
+				}
+				return o1.compareTo(o2);
+			}
+		});
+
+		Iterator<String> iterator = protocolSetList.iterator();
+		while (iterator.hasNext())
+		{
+			String protocolId = iterator.next();
+			String protocolDescription = cpBundle.getString(protocolId);
+
+			protocolModel.add(protocolDescription, protocolId);
+		}
+
+		return protocolModel;
 	}
 
 	/**

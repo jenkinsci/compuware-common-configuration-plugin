@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015 - 2018 Compuware Corporation
+ * Copyright (c) 2015 - 2019 Compuware Corporation
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
@@ -36,6 +36,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	// Member Variables
 	private final String m_description;
 	private final String m_hostPort;
+	private final String m_protocol;
 	private final String m_codePage;
 	private final String m_timeout;
 	private final String m_connectionId;
@@ -48,6 +49,8 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 *            the description of the host connection
 	 * @param hostPort
 	 *            the host:port
+	 * @param protocol
+	 *            the encryption protocol
 	 * @param codePage
 	 *            the code page to be used for the host connection
 	 * @param timeout
@@ -55,13 +58,14 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 * @param connectionId
 	 *            a unique identifier
 	 * @param cesUrl
-	 * 			  a CES URL
+	 *            a CES URL
 	 */
 	@DataBoundConstructor
-	public HostConnection(String description, String hostPort, String codePage, String timeout, String connectionId, String cesUrl)
+	public HostConnection(String description, String hostPort, String protocol, String codePage, String timeout, String connectionId, String cesUrl)
 	{
 		m_description = StringUtils.trimToEmpty(description);
 		m_hostPort = StringUtils.trimToEmpty(hostPort);
+		m_protocol = StringUtils.trimToEmpty(protocol);
 		m_codePage = StringUtils.trimToEmpty(codePage);
 		m_timeout = StringUtils.trimToEmpty(timeout);
 		m_connectionId = generateId(connectionId);
@@ -108,6 +112,16 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	public String getPort()
 	{
 		return StringUtils.substringAfter(getHostPort(), CommonConstants.COLON);
+	}
+
+	/**
+	 * Returns this connection's encryption protocol.
+	 * 
+	 * @return the encryption protocol
+	 */
+	public String getProtocol()
+	{
+		return m_protocol;
 	}
 
 	/**
