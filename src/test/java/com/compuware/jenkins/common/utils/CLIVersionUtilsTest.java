@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015 - 2018 Compuware Corporation
+ * Copyright (c) 2015 - 2019 Compuware Corporation
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
  * and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -27,6 +27,7 @@ import java.io.InputStream;
 import org.junit.Test;
 import org.mockito.Mockito;
 import com.compuware.jenkins.common.configuration.Messages;
+
 import hudson.AbortException;
 import hudson.FilePath;
 
@@ -56,7 +57,63 @@ public class CLIVersionUtilsTest
 			fail("Unexpected exception occured.");
 		}
 	}
-	
+
+	/**
+	 * Test method for {@link com.compuware.jenkins.common.utils.CLIVersionUtils#checkProtocolSupported(java.lang.String)}
+	 * 
+	 */
+	@Test
+	public void testCheckProtocolNotSupported() throws IOException, InterruptedException
+	{
+		final FilePath installPath = Mockito.mock(FilePath.class);
+		final FilePath versionFilePath = Mockito.mock(FilePath.class);
+		
+		Mockito.when(installPath.exists()).thenReturn(true);
+		Mockito.when(versionFilePath.exists()).thenReturn(true);
+		
+		Mockito.when(installPath.child(installPath.getRemote() + CommonConstants.SLASH + CommonConstants.VERSION_FILE)).thenReturn(versionFilePath);
+
+		try
+		{
+			String equalVersionXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+			equalVersionXml += "<product name=\"Compuware Topaz\" version=\"1.0.0\" build=\"188\"/>";
+			InputStream inputStream = new ByteArrayInputStream(equalVersionXml.getBytes());
+			Mockito.when(versionFilePath.read()).thenReturn(inputStream);
+
+			String cliVersion = CLIVersionUtils.getCLIVersion(installPath, CLIVersionUtils.HOST_CONNECTION_PROTOCOL_MINIMUM_VERSION);
+			CLIVersionUtils.checkProtocolSupported(cliVersion);
+			fail("Expected an AbortException to occur.");
+		}
+		catch (AbortException e)
+		{
+			assertEquals(Messages.hostConnectionProtocolCliVersionError(CLI_VERSION, CLIVersionUtils.HOST_CONNECTION_PROTOCOL_MINIMUM_VERSION), e.getMessage());
+		}
+	}
+
+	/**
+	 * Test method for {@link com.compuware.jenkins.common.utils.CLIVersionUtils#checkProtocolSupported(java.lang.String)}
+	 * 
+	 */
+	@Test
+	public void testCheckProtocolSupported() throws IOException, InterruptedException
+	{
+		final FilePath installPath = Mockito.mock(FilePath.class);
+		final FilePath versionFilePath = Mockito.mock(FilePath.class);
+		
+		Mockito.when(installPath.exists()).thenReturn(true);
+		Mockito.when(versionFilePath.exists()).thenReturn(true);
+		
+		Mockito.when(installPath.child(installPath.getRemote() + CommonConstants.SLASH + CommonConstants.VERSION_FILE)).thenReturn(versionFilePath);
+
+		String equalVersionXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+		equalVersionXml += "<product name=\"Compuware Topaz\" version=\"19.4.1\" build=\"188\"/>";
+		InputStream inputStream = new ByteArrayInputStream(equalVersionXml.getBytes());
+		Mockito.when(versionFilePath.read()).thenReturn(inputStream);
+
+		String cliVersion = CLIVersionUtils.getCLIVersion(installPath, CLIVersionUtils.HOST_CONNECTION_PROTOCOL_MINIMUM_VERSION);
+		CLIVersionUtils.checkProtocolSupported(cliVersion);
+	}
+
 	private void testCliDirectoryNotExist() throws IOException, InterruptedException
 	{
 		final FilePath installPath = Mockito.mock(FilePath.class);
@@ -65,7 +122,8 @@ public class CLIVersionUtilsTest
 		
 		try
 		{
-			CLIVersionUtils.checkCLICompatibility(installPath, CLI_VERSION);
+			String cliVersion = CLIVersionUtils.getCLIVersion(installPath, CLI_VERSION);
+			CLIVersionUtils.checkCLICompatibility(cliVersion, CLI_VERSION);
 			fail("Expected an AbortException to occur.");
 		}
 		catch (AbortException e)
@@ -86,7 +144,8 @@ public class CLIVersionUtilsTest
 		
 		try
 		{
-			CLIVersionUtils.checkCLICompatibility(installPath, CLI_VERSION);
+			String cliVersion = CLIVersionUtils.getCLIVersion(installPath, CLI_VERSION);
+			CLIVersionUtils.checkCLICompatibility(cliVersion, CLI_VERSION);
 			fail("Expected an AbortException to occur.");
 		}
 		catch (AbortException e)
@@ -111,14 +170,16 @@ public class CLIVersionUtilsTest
 			InputStream inputStream = new ByteArrayInputStream(equalVersionXml.getBytes());
 			Mockito.when(versionFilePath.read()).thenReturn(inputStream);
 			
-			CLIVersionUtils.checkCLICompatibility(installPath, CLI_VERSION);
+			String cliVersion = CLIVersionUtils.getCLIVersion(installPath, CLI_VERSION);
+			CLIVersionUtils.checkCLICompatibility(cliVersion, CLI_VERSION);
 			
 			String newerVersionXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 			newerVersionXml += "<product name=\"Compuware Topaz\" version=\"1.0.1\" build=\"188\"/>";
 			inputStream = new ByteArrayInputStream(newerVersionXml.getBytes());
 			Mockito.when(versionFilePath.read()).thenReturn(inputStream);
 			
-			CLIVersionUtils.checkCLICompatibility(installPath, CLI_VERSION);
+			cliVersion = CLIVersionUtils.getCLIVersion(installPath, CLI_VERSION);
+			CLIVersionUtils.checkCLICompatibility(cliVersion, CLI_VERSION);
 		}
 		catch (AbortException e)
 		{
@@ -146,7 +207,8 @@ public class CLIVersionUtilsTest
 			InputStream badInputStream = new ByteArrayInputStream(badXml.getBytes());
 			Mockito.when(versionFilePath.read()).thenReturn(badInputStream);
 			
-			CLIVersionUtils.checkCLICompatibility(installPath, CLI_VERSION);
+			String cliVersion = CLIVersionUtils.getCLIVersion(installPath, CLI_VERSION);
+			CLIVersionUtils.checkCLICompatibility(cliVersion, CLI_VERSION);
 			fail("Expected an AbortException to occur.");
 		}
 		catch (AbortException e)
@@ -162,7 +224,8 @@ public class CLIVersionUtilsTest
 			InputStream inputStream = new ByteArrayInputStream(xml.getBytes());
 			Mockito.when(versionFilePath.read()).thenReturn(inputStream);
 			
-			CLIVersionUtils.checkCLICompatibility(installPath, version);
+			String cliVersion = CLIVersionUtils.getCLIVersion(installPath, version);
+			CLIVersionUtils.checkCLICompatibility(cliVersion, version);
 			fail("Expected an AbortException to occur.");
 		}
 		catch (AbortException e)
@@ -179,7 +242,8 @@ public class CLIVersionUtilsTest
 			InputStream inputStream = new ByteArrayInputStream(xml.getBytes());
 			Mockito.when(versionFilePath.read()).thenReturn(inputStream);
 
-			CLIVersionUtils.checkCLICompatibility(installPath, version);
+			String cliVersion = CLIVersionUtils.getCLIVersion(installPath, version);
+			CLIVersionUtils.checkCLICompatibility(cliVersion, version);
 			fail("Expected an AbortException to occur.");
 		}
 		catch (AbortException e)
