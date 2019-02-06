@@ -36,6 +36,9 @@ import hudson.FilePath;
  */
 public class CLIVersionUtils
 {
+
+	public static final String HOST_CONNECTION_PROTOCOL_MINIMUM_VERSION = "19.4.1"; //$NON-NLS-1$
+
 	/**
 	 * Private constructor.
 	 * <p>
@@ -46,43 +49,26 @@ public class CLIVersionUtils
 	}
 	
 	/**
-	 * Checks if the version of the installed Topaz CLI is greater or equal to the Jenkins plugins
-	 * required version. This will abort the Jenkins job if CLI is not compatible.
+	 * Reads the version.xml file from the CLI directory and gets the version number.
 	 * 
 	 * @param cliDirectory
 	 * 		FilePath of the Topaz CLI install directory
 	 * @param minimumVersion
 	 * 		Minimum required CLI version of the Jenkins plugin
 	 * 
-	 * @throws IOException if an I/O error occurs checking directory existence or getting the CLI version 
-	 * @throws InterruptedException if checking directory existence or getting the CLI version is interrupted by another thread
+	 * @return the CLI version
+	 * @throws IOException if the CLI directory or the version file do not exist
+	 * @throws InterruptedException if retrieval of CLI version is interrupted by another thread
 	 */
-	public static void checkCLICompatibility(FilePath cliDirectory, String minimumVersion) throws IOException, InterruptedException
-	{	
+	public static String getCLIVersion(FilePath cliDirectory, String minimumVersion) throws IOException, InterruptedException
+	{
+		String version = ""; //$NON-NLS-1$
+		
 		if (!cliDirectory.exists())
 		{
 			throw new AbortException(Messages.cliNotInstalledError());
 		}
-		
-		String version = getCLIVersion(cliDirectory, minimumVersion);
-		
-		if (StringUtils.isEmpty(version))
-		{
-			throw new AbortException(Messages.cliOldUnknownVersionError(minimumVersion));
-		}
-		else if (compareVersions(version, minimumVersion) < 0)
-		{
-			throw new AbortException(Messages.cliOldVersionError(version, minimumVersion));
-		}
-	}
-	
-	/*
-	 * 	Reads the version.xml file from the CLI directory and gets the version number
-	 */
-	private static String getCLIVersion(FilePath cliDirectory, String minimumVersion) throws IOException, InterruptedException
-	{
-		String version = ""; //$NON-NLS-1$
-		
+
 		FilePath versionFilePath = cliDirectory.child(cliDirectory.getRemote() + CommonConstants.SLASH + CommonConstants.VERSION_FILE);
 		
 		if (!versionFilePath.exists())
@@ -94,7 +80,48 @@ public class CLIVersionUtils
 		
 		return version;
 	}
-	
+
+	/**
+	 * Checks if the version of the installed Topaz CLI is greater or equal to the Jenkins plugins
+	 * required version. This will abort the Jenkins job if CLI is not compatible.
+	 * 
+	 * @param version
+	 * 		current CLI version
+	 * @param minimumVersion
+	 * 		minimum required CLI version of the Jenkins plugin
+	 * 
+	 * @throws IOException if an I/O error occurs checking directory existence or getting the CLI version 
+	 * @throws InterruptedException if checking directory existence or getting the CLI version is interrupted by another thread
+	 */
+	public static void checkCLICompatibility(String version, String minimumVersion) throws IOException, InterruptedException
+	{		
+		if (StringUtils.isEmpty(version))
+		{
+			throw new AbortException(Messages.cliOldUnknownVersionError(minimumVersion));
+		}
+		else if (compareVersions(version, minimumVersion) < 0)
+		{
+			throw new AbortException(Messages.cliOldVersionError(version, minimumVersion));
+		}
+	}
+
+	/**
+	 * Checks if encryption protocol is supported on a host connection for the specified CLI version.
+	 * <p>
+	 * The Jenkins job will be aborted if the CLI does not support encryption protocol.
+	 * 
+	 * @param cliVersion the CLI version to check
+	 * 
+	 * @throws AbortException if the encryption protocol is not supported
+	 */
+	public static void checkProtocolSupported(String cliVersion) throws AbortException 
+	{
+		if (compareVersions(cliVersion, HOST_CONNECTION_PROTOCOL_MINIMUM_VERSION) < 0)
+		{
+			throw new AbortException(Messages.hostConnectionProtocolCliVersionError(cliVersion, HOST_CONNECTION_PROTOCOL_MINIMUM_VERSION));
+		}
+	}
+
 	/*
 	 * 	Compares the CLI version with the plugins required version
 	 */
