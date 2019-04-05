@@ -19,10 +19,13 @@ package com.compuware.jenkins.common.configuration;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+
 import com.compuware.jenkins.common.utils.CommonConstants;
+
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -70,6 +73,44 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 		m_timeout = StringUtils.trimToEmpty(timeout);
 		m_connectionId = generateId(connectionId);
 		m_cesUrl = StringUtils.trimToEmpty(cesUrl);
+	}
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param description
+	 *            the description of the host connection
+	 * @param hostPort
+	 *            the host:port
+	 * @param codePage
+	 *            the code page to be used for the host connection
+	 * @param timeout
+	 *            the read/write timeout to honor on the host connection
+	 * @param connectionId
+	 *            a unique identifier
+	 * @param cesUrl
+	 *            a CES URL
+	 */
+	public HostConnection(String description, String hostPort, String codePage, String timeout, String connectionId, String cesUrl) {
+		this(description, hostPort, null, codePage, timeout, connectionId, cesUrl);
+	}
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param description
+	 *            the description of the host connection
+	 * @param hostPort
+	 *            the host:port
+	 * @param codePage
+	 *            the code page to be used for the host connection
+	 * @param timeout
+	 *            the read/write timeout to honor on the host connection
+	 * @param connectionId
+	 *            a unique identifier
+	 */
+	public HostConnection(String description, String hostPort, String codePage, String timeout, String connectionId) {
+		this(description, hostPort, null, codePage, timeout, connectionId, null);
 	}
 
 	/**
