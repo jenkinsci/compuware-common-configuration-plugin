@@ -21,13 +21,17 @@ package com.compuware.jenkins.common.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
 import com.compuware.jenkins.common.configuration.Messages;
+
 import hudson.AbortException;
 import hudson.FilePath;
 
@@ -82,19 +86,21 @@ public class CLIVersionUtils
 	}
 
 	/**
-	 * Checks if the version of the installed Topaz CLI is greater or equal to the Jenkins plugins
-	 * required version. This will abort the Jenkins job if CLI is not compatible.
+	 * Checks if the version of the installed Topaz CLI is greater or equal to the Jenkins plugins required version. This will abort the
+	 * Jenkins job if CLI is not compatible.
 	 * 
 	 * @param version
-	 * 		current CLI version
+	 *            current CLI version
 	 * @param minimumVersion
-	 * 		minimum required CLI version of the Jenkins plugin
+	 *            minimum required CLI version of the Jenkins plugin
 	 * 
-	 * @throws IOException if an I/O error occurs checking directory existence or getting the CLI version 
-	 * @throws InterruptedException if checking directory existence or getting the CLI version is interrupted by another thread
+	 * @throws IOException
+	 *             if an I/O error occurs checking directory existence or getting the CLI version
+	 * @throws InterruptedException
+	 *             if checking directory existence or getting the CLI version is interrupted by another thread
 	 */
 	public static void checkCLICompatibility(String version, String minimumVersion) throws IOException, InterruptedException
-	{		
+	{
 		if (StringUtils.isEmpty(version))
 		{
 			throw new AbortException(Messages.cliOldUnknownVersionError(minimumVersion));
@@ -103,6 +109,25 @@ public class CLIVersionUtils
 		{
 			throw new AbortException(Messages.cliOldVersionError(version, minimumVersion));
 		}
+	}
+
+	/**
+	 * Checks if the version of the installed Topaz CLI is greater or equal to the Jenkins plugins required version. This will abort the
+	 * Jenkins job if CLI is not compatible.
+	 * 
+	 * @param cliDirectory
+	 *            FilePath of the Topaz CLI install directory
+	 * @param minimumVersion
+	 *            minimum required CLI version of the Jenkins plugin
+	 * 
+	 * @throws IOException
+	 *             if an I/O error occurs checking directory existence or getting the CLI version
+	 * @throws InterruptedException
+	 *             if checking directory existence or getting the CLI version is interrupted by another thread
+	 */
+	public static void checkCLICompatibility(FilePath cliDirectory, String minimumVersion) throws IOException, InterruptedException {
+		String version = getCLIVersion(cliDirectory, minimumVersion);
+		checkCLICompatibility(version, minimumVersion);
 	}
 
 	/**
