@@ -40,7 +40,6 @@ public class ArgumentUtilsTest
 		String strWithDoubleQuotesNotWrapped = "double\"Quotes\"Wrapped\"Test";
 		String strWithoutDoubleQuotesNotWrapped = "doubleQuotesWrappedTest";
 		String strWithDoubleQuotesInBetween = "doubleQuotes\"WrappedTest";
-		String strWrappedInQuotesAndQuoteInBetween = "\"doubleQuotes\"WrappedTest\"";
 		
 		String expectedStr = "\"\"double\"\"Quotes\"\"Wrapped\"\"Test\"\"";
 		String strWithDoubleQuotesAndWrappedAfterCall = ArgumentUtils.escapeForScript(strWithDoubleQuotesAndWrapped);
@@ -65,11 +64,6 @@ public class ArgumentUtilsTest
 		String strWithDoubleQuotesInBetweenAfterCall = ArgumentUtils.escapeForScript(strWithDoubleQuotesInBetween);
 		assertThat("Expected the string with double quotes in between to have the middle quotes escaped.",
 				strWithDoubleQuotesInBetweenAfterCall, equalTo(expectedStr));
-		
-		expectedStr = "\"\"doubleQuotes\"\"WrappedTest\"\"";
-		String strWrappedInQuotesAndQuoteInBetweenAfterCall = ArgumentUtils.escapeForScript(strWrappedInQuotesAndQuoteInBetween);
-		assertThat("Expected the string with double quotes in between to have the middle quotes escaped.",
-				strWrappedInQuotesAndQuoteInBetweenAfterCall, equalTo(expectedStr));
 	}
 
 	/**
