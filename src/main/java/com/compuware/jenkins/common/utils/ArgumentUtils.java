@@ -55,12 +55,19 @@ public class ArgumentUtils
 		String output = input;
 
 		if (StringUtils.isNotEmpty(input))
-		{
-			// escape any double quote (") with another double quote (")
-			output = StringUtils.replace(input, CommonConstants.DOUBLE_QUOTE, CommonConstants.DOUBLE_QUOTE_ESCAPED);
-
-			// wrap the input in double quotes
-			output = wrapInDoubleQuotes(output);
+		{	
+			if(!input.contains(CommonConstants.DOUBLE_QUOTE)) {
+				
+				// wrap the input in double quotes
+				output = wrapInDoubleQuotes(output);
+			} else {
+				
+				// escape any double quote (") with another double quote (")
+				output = StringUtils.replace(input, CommonConstants.DOUBLE_QUOTE, CommonConstants.DOUBLE_QUOTE_ESCAPED);
+	
+				// wrap the input in double quotes
+				output = wrapInDoubleQuotes(output);
+			}
 		}
 
 		return output;
@@ -82,14 +89,15 @@ public class ArgumentUtils
 	public static String escapeCommaDelimitedPathsForScript(String input)
 	{
 		String output = input;
-
+		
 		if (StringUtils.isNotEmpty(input))
 		{
 			// remove all double quotes from the path
 			output = StringUtils.remove(input, CommonConstants.DOUBLE_QUOTE);
-
+			
 			// wrap the input in double quotes
 			output = wrapInDoubleQuotes(output);
+	
 		}
 
 		return output;
