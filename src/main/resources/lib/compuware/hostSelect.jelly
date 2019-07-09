@@ -10,7 +10,7 @@
 	
 	<div class="host-selection-control">
 		<f:select clazz="${attrs.clazz} host-select" field="${attrs.field}" value="${attrs.value}" default="${attrs.default}" />
-    	<a class="configure" href="/configure#cpwr-config">Manage connections</a>
+    	<a class="configure" href="${rootURL}/configure#cpwr-config">Manage connections</a>
     </div>
     
 </j:jelly>
