@@ -23,7 +23,7 @@
 
   <name>Compuware Common Configuration</name>
   <description>Compuware Topaz (R) interface to specify common configuration parameters</description>
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/Compuware+Common+Configuration+Plugin</url>
+  <url>https://github.com/jenkinsci/compuware-common-configuration-plugin</url>
 
   <licenses>
     <license>
