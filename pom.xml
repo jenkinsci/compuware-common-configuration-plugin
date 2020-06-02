@@ -10,7 +10,7 @@
   </parent>
   <groupId>com.compuware.jenkins</groupId>
   <artifactId>compuware-common-configuration</artifactId>
-  <version>1.0.11-SNAPSHOT</version>
+  <version>1.0.10-SNAPSHOT</version>
   <packaging>hpi</packaging>
 
   <!-- I think this should be specified now
