@@ -10,11 +10,7 @@
   </parent>
   <groupId>com.compuware.jenkins</groupId>
   <artifactId>compuware-common-configuration</artifactId>
-<<<<<<< Upstream, based on origin/master
   <version>1.0.11-SNAPSHOT</version>
-=======
-  <version>1.0.10</version>
->>>>>>> e92b751 [maven-release-plugin] prepare release compuware-common-configuration-1.0.10
   <packaging>hpi</packaging>
 
   <!-- I think this should be specified now
