@@ -1,6 +1,11 @@
 Change Log
 =========
 
+1.0.10
+------
+
+- Version history moved out of Wiki content and linked to CHANGELOG.MD; subsequent changes will not be tracked in this file, but in [GitHub releases](https://github.com/jenkinsci/compuware-common-configuration-plugin/releases) instead.
+
 1.0.9
 ------
 
