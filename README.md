@@ -1,6 +1,6 @@
 # Compuware Common Configuration Plugin
 
-[![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/compuware-common-configuration.svg)](https://plugins.jenkins.io/compuware-common-configuration) [![GitHub release](https://img.shields.io/github/v/release/jenkinsci/compuware-common-configuration-plugin.svg?label=release)](https://github.com/jenkinsci/ccompuware-common-configuration-plugin/releases/latest) [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/compuware-common-configuration.svg?color=blue)](https://plugins.jenkins.io/compuware-common-configuration)
+[![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/compuware-common-configuration.svg)](https://plugins.jenkins.io/compuware-common-configuration) [![GitHub release](https://img.shields.io/github/v/release/jenkinsci/compuware-common-configuration-plugin.svg?label=release)](https://github.com/jenkinsci/compuware-common-configuration-plugin/releases/latest) [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/compuware-common-configuration.svg?color=blue)](https://plugins.jenkins.io/compuware-common-configuration)
 
 ## Overview
 
