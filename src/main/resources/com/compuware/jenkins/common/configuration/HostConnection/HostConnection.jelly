@@ -19,9 +19,9 @@
 	    <f:entry title="${%cesUrl}" field="cesUrl" help="/plugin/compuware-common-configuration/help-cesUrl.html">
 	        <f:textbox value="${hostConn.getCesUrl()}" checkUrl="'${rootURL}/descriptorByName/HostConnection/checkCesUrl?value='+this.value" default=""/>
 	    </f:entry>
-	    <f:invisibleEntry>
-	    	<f:textbox field="connectionId" value="${hostConn.getConnectionId()}"/>
-	    </f:invisibleEntry>
+	    <f:entry title="${%connectionId}" field="connectionId" help="/plugin/compuware-common-configuration/help-connectionId.html">
+	    	<f:textbox value="${hostConn.getConnectionId()}"/>
+	    </f:entry>
 	    <f:entry title="">
 	    	<div align="right">
 	        	<f:repeatableDeleteButton value="${%deleteHostConnection}"/>
