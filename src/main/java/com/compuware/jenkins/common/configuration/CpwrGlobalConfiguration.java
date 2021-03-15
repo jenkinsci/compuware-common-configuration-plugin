@@ -2,6 +2,8 @@
  * The MIT License (MIT)
  * 
  * Copyright (c) 2015 - 2019 Compuware Corporation
+ * (c) Copyright 2015 - 2019, 2021 BMC Software, Inc.
+ * 
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
@@ -30,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.matchers.IdMatcher;
@@ -427,6 +430,32 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		{
 			if (matcher.matches(c))
 			{
+				credentials = c;
+			}
+		}
+
+		return credentials;
+	}
+	
+	/**
+	 * Retrieves login information given a credentials identifier.
+	 * 
+	 * @param project
+	 *            the Jenkins project
+	 * @param credentialsId
+	 *            the <code>String</code> identifier of the credentials to obtain
+	 * @return StandardCredentials object contains the credentials with login information
+	 * 			this object can be of type UsernamePasswordCredentialsImpl or CertificateCredentialsImpl.
+	 */
+	public StandardCredentials getUserLoginInformation(Item project, String credentialsId) {
+		StandardCredentials credentials = null;
+
+		List<StandardCredentials> credentialsList = CredentialsProvider.lookupCredentials(StandardCredentials.class,
+				project, ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
+
+		IdMatcher matcher = new IdMatcher(credentialsId);
+		for (StandardCredentials c : credentialsList) {
+			if (matcher.matches(c)) {
 				credentials = c;
 			}
 		}
