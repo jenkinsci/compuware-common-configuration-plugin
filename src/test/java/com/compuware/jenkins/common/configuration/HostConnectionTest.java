@@ -17,15 +17,31 @@
 package com.compuware.jenkins.common.configuration;
 
 import static org.junit.Assert.assertEquals;
+
+import java.io.File;
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.jvnet.hudson.test.JenkinsRule;
+
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.CredentialsScope;
+import com.cloudbees.plugins.credentials.CredentialsStore;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.domains.Domain;
+import com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl;
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import com.compuware.jenkins.common.configuration.HostConnection.DescriptorImpl;
+
+import hudson.model.FreeStyleProject;
 import hudson.util.FormValidation;
 import hudson.util.FormValidation.Kind;
+import hudson.util.Secret;
+import jenkins.model.Jenkins;
 
 /**
  * Class for testing the Compuware global host connection configuration.
@@ -35,6 +51,9 @@ public class HostConnectionTest
 {
 	@Rule
 	public JenkinsRule j = new JenkinsRule();
+	
+	@Rule
+	public TemporaryFolder tmp = new TemporaryFolder();
 
 	private HostConnection m_globalHostConnectionConfig;
 
@@ -224,5 +243,46 @@ public class HostConnectionTest
 		input = "https://myurl.com";
 		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckCesUrl(input);
 		assertEquals(FormValidation.ok().toString(), validation.toString());
+	}
+	
+	/**
+	 * Test retrieves login information given a credentials identifier.
+	 */
+	@Test
+	public void configure_system_credentials() throws Exception {
+
+		final String credentialsId1 = "credsId1";
+		final String credentialsId2 = "credsId2";
+		final String username = "bob";
+		final String password1 = "s$$cr3t";
+		final String password2 = "secret";
+		File certificate = tmp.newFile("a.certificate");
+
+		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
+		StandardCredentials usernamePasswordCredentials = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,
+				credentialsId1, "sample", username, password1);
+
+		StandardCredentials certificateCredentials = new CertificateCredentialsImpl(CredentialsScope.GLOBAL,
+				credentialsId2, "sample", password2,
+				new CertificateCredentialsImpl.FileOnMasterKeyStoreSource(certificate.getAbsolutePath()));
+
+		FreeStyleProject project = j.createFreeStyleProject();
+		CredentialsStore store = CredentialsProvider.lookupStores(Jenkins.getInstance()).iterator().next();
+		store.addCredentials(Domain.global(), usernamePasswordCredentials);
+		store.addCredentials(Domain.global(), certificateCredentials);
+
+		StandardCredentials usernamePasswordCredentialsInfo = globalConfig.getUserLoginInformation(project,
+				credentialsId1);
+
+		UsernamePasswordCredentialsImpl credentials1 = (UsernamePasswordCredentialsImpl) usernamePasswordCredentialsInfo;
+		assertEquals(credentials1.getId(), credentialsId1);
+		assertEquals(credentials1.getUsername(), username);
+		assertEquals(Secret.toString(credentials1.getPassword()), password1);
+
+		StandardCredentials certificateCredentialsInfo = globalConfig.getUserLoginInformation(project, credentialsId2);
+		CertificateCredentialsImpl credentials2 = (CertificateCredentialsImpl) certificateCredentialsInfo;
+		assertEquals(credentials2.getId(), credentialsId2);
+		assertEquals(Secret.toString(credentials2.getPassword()), password2);
+
 	}
 }
