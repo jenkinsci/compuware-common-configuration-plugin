@@ -18,10 +18,15 @@
  */
 package com.compuware.jenkins.common.configuration;
 
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -32,6 +37,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardCertificateCredentials;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
@@ -461,5 +467,31 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		}
 
 		return credentials;
+	}
+	
+	/**
+	 * @param credentials
+	 * @return the X509Certificate as a string
+	 * @throws KeyStoreException
+	 */
+	public String getCertificate(StandardCertificateCredentials credentials) throws KeyStoreException {
+		Certificate certificate = null;
+		String certificateStr = null;
+		KeyStore keyStoreFromSystem = ((StandardCertificateCredentials) credentials).getKeyStore();
+		for (Enumeration<String> enumeration = keyStoreFromSystem.aliases(); enumeration.hasMoreElements();) {
+			String alias = enumeration.nextElement();
+			if (keyStoreFromSystem.isKeyEntry(alias)) {
+				Certificate[] certificateChain = keyStoreFromSystem.getCertificateChain(alias);
+				if (certificateChain != null && certificateChain.length > 0) {
+					certificate = certificateChain[0];
+					if (certificate instanceof X509Certificate) {
+						X509Certificate x509 = (X509Certificate) certificate;
+						certificateStr = x509.toString();
+					}
+				}
+			}
+		}
+
+		return certificateStr;
 	}
 }
