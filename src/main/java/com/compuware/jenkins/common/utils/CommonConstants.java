@@ -41,7 +41,7 @@ public class CommonConstants
 	public static final String PROTOCOL_PARM = "-protocol";
 	public static final String HOST_PARM = "-host";
 	public static final String PW_PARM = "-pass";
-	public static final String CERT_PARM = "-cert";
+	public static final String CERT_PARM = "-certificate";
 	public static final String PORT_PARM = "-port";
 	public static final String USERID_PARM = "-id";
 	public static final String TARGET_FOLDER_PARM = "-targetFolder";

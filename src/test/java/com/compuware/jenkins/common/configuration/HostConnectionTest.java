@@ -18,10 +18,33 @@ package com.compuware.jenkins.common.configuration;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Paths;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletException;
+
+import org.apache.tools.ant.taskdefs.TempFile;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,13 +54,21 @@ import org.jvnet.hudson.test.JenkinsRule;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.CredentialsStore;
+import com.cloudbees.plugins.credentials.common.CertificateCredentials;
+import com.cloudbees.plugins.credentials.common.StandardCertificateCredentials;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.Domain;
 import com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
+import com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl.KeyStoreSource;
 import com.compuware.jenkins.common.configuration.HostConnection.DescriptorImpl;
+import com.compuware.jenkins.common.utils.ArgumentUtils;
+import com.compuware.jenkins.common.utils.CommonConstants;
 
+import hudson.AbortException;
 import hudson.model.FreeStyleProject;
+import hudson.util.ArgumentListBuilder;
 import hudson.util.FormValidation;
 import hudson.util.FormValidation.Kind;
 import hudson.util.Secret;
@@ -54,7 +85,7 @@ public class HostConnectionTest
 	
 	@Rule
 	public TemporaryFolder tmp = new TemporaryFolder();
-
+	
 	private HostConnection m_globalHostConnectionConfig;
 
 	@Before
@@ -285,4 +316,53 @@ public class HostConnectionTest
 		assertEquals(Secret.toString(credentials2.getPassword()), password2);
 
 	}
+	
+//	We need getCertificateStr() to test globalConfig.getCertificate() using certificate of type (.pfx ).
+//	We need to use a certificate of type (.pfx) because we use a default keystore of type "PKCS12".
+//	The problem is we have to export the private Key in the certificate to make it of type ".pfx" and we can't add this certificate in our plugin for security since we publish this code in GitHub so I commented out getCertificateStr().
+//	We can't run getCertificateStr() as part of HostConnectionTest since I didn't add the certificate that we need to use in the test but we can run this test manually after creating a certificate of type (.pfx )
+//	this link shows how to do this (https://mindfulsoftware.com.au/blog/1409024/Converting-a-cer-file-to-pfx-using-the-Windows-MMC-snapin).
+//	then add this certificate to compuware-common-configuration-plugin -> src/main/resources.	
+//	
+//	@Test
+//	public void getCertificateStr() throws Exception {
+//
+//		final String credentialsId2 = "credsId2";
+//
+//		final String password2 = "changeit";
+//
+//		String fullCertPath = "/newCert.pfx";
+//
+//		URL is = this.getClass().getResource(fullCertPath);
+//
+////		InputStream b = this.getClass().getResourceAsStream(fullCertPath);
+//
+//		File file = new File(is.toString());
+//
+//		String path = is.toString().substring(6);
+//
+//		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
+//
+//		KeyStoreSource keyStoreSource = new CertificateCredentialsImpl.FileOnMasterKeyStoreSource(path);
+//
+//		StandardCredentials certificateCredentials = new CertificateCredentialsImpl(CredentialsScope.GLOBAL,
+//				credentialsId2, "sample", password2, keyStoreSource);
+//
+//		CredentialsStore store = CredentialsProvider.lookupStores(Jenkins.getInstance()).iterator().next();
+//
+//		store.addCredentials(Domain.global(), certificateCredentials);
+//
+//		globalConfig.getCertificate((StandardCertificateCredentials) certificateCredentials);
+//
+//		ArgumentListBuilder args = globalConfig.ArgumentListBuilder("19.4.1", certificateCredentials, "protocol",
+//				"codePage", "timeout", "host", "port");
+//
+//		System.out.println(args.toString());
+//
+//	}
+
 }
+
+
+
+
