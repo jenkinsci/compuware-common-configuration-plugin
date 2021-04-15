@@ -4,7 +4,6 @@
  * Copyright (c) 2015 - 2019 Compuware Corporation
  * (c) Copyright 2015 - 2019, 2021 BMC Software, Inc.
  * 
- * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
  * modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
@@ -21,6 +20,7 @@ package com.compuware.jenkins.common.configuration;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +33,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -42,9 +43,12 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.matchers.IdMatcher;
+import com.compuware.jenkins.common.utils.ArgumentUtils;
+import com.compuware.jenkins.common.utils.CLIVersionUtils;
 import com.compuware.jenkins.common.utils.CommonConstants;
 import com.compuware.jenkins.common.utils.NumericStringComparator;
 
+import hudson.AbortException;
 import hudson.CopyOnWrite;
 import hudson.Extension;
 import hudson.Launcher;
@@ -52,6 +56,7 @@ import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.Item;
 import hudson.security.ACL;
+import hudson.util.ArgumentListBuilder;
 import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
 import net.sf.json.JSONArray;
@@ -469,12 +474,54 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		return credentials;
 	}
 	
+	
 	/**
-	 * @param credentials
-	 * @return the X509Certificate as a string
-	 * @throws KeyStoreException
+	 * Encode the specified <code>X509Certificate</code> as a Base64 string.
+	 * 
+	 * @param x509Certificate
+	 * 			An instance of <code>X509Certificate</code>.
+	 * 
+	 * @return	A Base64 encoded representation of the <code>X509Certificate</code>.
+	 * 			<code>null</code> is return if no <code>X509Certificate</code> provided.
+	 * 
+	 * @throws CertificateEncodingException 
 	 */
-	public String getCertificate(StandardCertificateCredentials credentials) throws KeyStoreException {
+	public String encodeX509Certificate(X509Certificate x509Certificate) throws CertificateEncodingException {
+		if (x509Certificate != null) {
+			byte[] encodedCert = x509Certificate.getEncoded();
+			return encodeX509Certificate(encodedCert);
+		}
+
+		return null;
+	}
+	
+	
+	/**
+	 * Encode the specified <code>X509Certificate</code>, specified as an
+	 * array of bytes as a Base64 string.
+	 * 
+	 * @param byteX509Certificate
+	 * 			An array of bytes that represents the X509Certificate
+	 */
+	public String encodeX509Certificate(byte[] byteX509Certificate)
+	{
+		return new String(Base64.encodeBase64(byteX509Certificate));
+	}
+	
+	/**
+	 * @param credentials An instance of
+	 *                    <code>StandardCertificateCredentials</code>.
+	 *                    
+	 * @return a string of Base64 encoded representation of the <code>X509Certificate</code>.
+	 * 			if we found this certificate in certificateChain using the keystore
+	 *         <code>null</code> is return if no <code>X509Certificate</code>
+	 *         founded.
+	 *         
+	 * @throws KeyStoreException
+	 * @throws CertificateEncodingException
+	 */
+	public String getCertificate(StandardCertificateCredentials credentials)
+			throws KeyStoreException, CertificateEncodingException {
 		Certificate certificate = null;
 		String certificateStr = null;
 		KeyStore keyStoreFromSystem = ((StandardCertificateCredentials) credentials).getKeyStore();
@@ -486,12 +533,69 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 					certificate = certificateChain[0];
 					if (certificate instanceof X509Certificate) {
 						X509Certificate x509 = (X509Certificate) certificate;
-						certificateStr = x509.toString();
+						certificateStr = encodeX509Certificate(x509);
+
 					}
 				}
 			}
 		}
 
 		return certificateStr;
+	}
+		
+	/**
+	 * build the list of arguments to pass to the CLI
+	 * @param cliVersion
+	 * @param credentials
+	 * @param protocol
+	 * @param codePage
+	 * @param timeout
+	 * @param host
+	 * @param port
+	 * @return the list of arguments to pass to the CLI
+	 * @throws AbortException
+	 * @throws CertificateEncodingException
+	 */
+	public ArgumentListBuilder ArgumentListBuilder(String cliVersion, StandardCredentials credentials, String protocol,
+			String codePage, String timeout, String host, String port)
+			throws AbortException, CertificateEncodingException {
+		
+		String password = null;
+		String userId = null;
+		String certificateStr = null;
+		ArgumentListBuilder args = new ArgumentListBuilder();
+
+		if (credentials instanceof StandardUsernamePasswordCredentials) {
+			userId = ArgumentUtils.escapeForScript(((StandardUsernamePasswordCredentials) credentials).getUsername());
+			password = ArgumentUtils
+					.escapeForScript(((StandardUsernamePasswordCredentials) credentials).getPassword().getPlainText());
+		} else if (credentials instanceof StandardCertificateCredentials) {
+			StandardCertificateCredentials credentialsCer = (StandardCertificateCredentials) credentials;
+			try {
+				certificateStr = getCertificate(credentialsCer);
+			} catch (KeyStoreException e) {
+				throw new AbortException(String.format("Unable to get the certificate Exception: %s", e.getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+		args.add(CommonConstants.HOST_PARM, host);
+		args.add(CommonConstants.PORT_PARM, port);
+		if (userId != null) {
+			args.add(CommonConstants.USERID_PARM, userId);
+		}
+		if (certificateStr != null) {
+			args.add(CommonConstants.CERT_PARM, certificateStr);
+		}
+		if (password != null) {
+			args.add(CommonConstants.PW_PARM);
+			args.add(password, true);
+		}
+		// do not pass protocol on command line if null, empty, blank, or 'None'
+		if (StringUtils.isNotBlank(protocol) && !StringUtils.equalsIgnoreCase(protocol, "none")) { //$NON-NLS-1$
+			CLIVersionUtils.checkProtocolSupported(cliVersion);
+			args.add(CommonConstants.PROTOCOL_PARM, protocol);
+		}
+		args.add(CommonConstants.CODE_PAGE_PARM, codePage);
+		args.add(CommonConstants.TIMEOUT_PARM, timeout);
+		return args;
 	}
 }
