@@ -2,6 +2,7 @@
  * The MIT License (MIT)
  * 
  * Copyright (c) 2015 - 2019 Compuware Corporation
+ * (c) Copyright 2015 - 2019, 2021 BMC Software, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
@@ -40,6 +41,7 @@ public class CommonConstants
 	public static final String PROTOCOL_PARM = "-protocol";
 	public static final String HOST_PARM = "-host";
 	public static final String PW_PARM = "-pass";
+	public static final String CERT_PARM = "-certificate";
 	public static final String PORT_PARM = "-port";
 	public static final String USERID_PARM = "-id";
 	public static final String TARGET_FOLDER_PARM = "-targetFolder";
