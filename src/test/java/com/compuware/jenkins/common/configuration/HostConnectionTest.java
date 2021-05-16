@@ -18,33 +18,11 @@ package com.compuware.jenkins.common.configuration;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Paths;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.Enumeration;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletException;
 
-import org.apache.tools.ant.taskdefs.TempFile;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,19 +32,13 @@ import org.jvnet.hudson.test.JenkinsRule;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.CredentialsStore;
-import com.cloudbees.plugins.credentials.common.CertificateCredentials;
-import com.cloudbees.plugins.credentials.common.StandardCertificateCredentials;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.Domain;
 import com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import com.cloudbees.plugins.credentials.impl.CertificateCredentialsImpl.KeyStoreSource;
 import com.compuware.jenkins.common.configuration.HostConnection.DescriptorImpl;
-import com.compuware.jenkins.common.utils.ArgumentUtils;
-import com.compuware.jenkins.common.utils.CommonConstants;
 
-import hudson.AbortException;
 import hudson.model.FreeStyleProject;
 import hudson.util.ArgumentListBuilder;
 import hudson.util.FormValidation;
@@ -77,9 +49,11 @@ import jenkins.model.Jenkins;
 /**
  * Class for testing the Compuware global host connection configuration.
  */
-@SuppressWarnings("nls")
-public class HostConnectionTest
-{
+public class HostConnectionTest {
+	
+	private static final String CERT_FILENAME = "/topazrg-pub.p12";
+	private static final String CERT_PASSWORD = "compuware";
+	
 	@Rule
 	public JenkinsRule j = new JenkinsRule();
 	
@@ -92,6 +66,11 @@ public class HostConnectionTest
 	public void setUp()
 	{
 		m_globalHostConnectionConfig = new HostConnection("test", "cw01:1234", "TLSv1.2", "1047", "0", "1", "2");
+	}
+	
+	private String getResourcePath(String resourceName) {
+		URL is = this.getClass().getResource(resourceName);
+		return is.toString().substring(6);
 	}
 
 	/**
@@ -286,81 +265,59 @@ public class HostConnectionTest
 		final String credentialsId2 = "credsId2";
 		final String username = "bob";
 		final String password1 = "s$$cr3t";
-		final String password2 = "secret";
-		File certificate = tmp.newFile("a.certificate");
+		final String certUser = "EMAILADDRESS=topazrg@compuware.com, CN=TOPAZRG, OU=Engineering, O=Compuware, L=Detroit, ST=Michigan, C=US";
 
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
 		StandardCredentials usernamePasswordCredentials = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,
 				credentialsId1, "sample", username, password1);
 
 		StandardCredentials certificateCredentials = new CertificateCredentialsImpl(CredentialsScope.GLOBAL,
-				credentialsId2, "sample", password2,
-				new CertificateCredentialsImpl.FileOnMasterKeyStoreSource(certificate.getAbsolutePath()));
+				credentialsId2, "sample", CERT_PASSWORD,
+				new CertificateCredentialsImpl.FileOnMasterKeyStoreSource(getResourcePath(CERT_FILENAME)));
 
 		FreeStyleProject project = j.createFreeStyleProject();
 		CredentialsStore store = CredentialsProvider.lookupStores(Jenkins.getInstance()).iterator().next();
 		store.addCredentials(Domain.global(), usernamePasswordCredentials);
 		store.addCredentials(Domain.global(), certificateCredentials);
 
-		StandardCredentials usernamePasswordCredentialsInfo = globalConfig.getUserLoginInformation(project,
-				credentialsId1);
-
+		StandardCredentials usernamePasswordCredentialsInfo = globalConfig.getLoginCredentials(project,	credentialsId1);
 		UsernamePasswordCredentialsImpl credentials1 = (UsernamePasswordCredentialsImpl) usernamePasswordCredentialsInfo;
-		assertEquals(credentials1.getId(), credentialsId1);
-		assertEquals(credentials1.getUsername(), username);
-		assertEquals(Secret.toString(credentials1.getPassword()), password1);
+		assertEquals(credentials1.getId(), credentialsId1);						// NOSONAR
+		assertEquals(credentials1.getUsername(), username);						// NOSONAR
+		assertEquals(Secret.toString(credentials1.getPassword()), password1);	// NOSONAR
 
-		StandardCredentials certificateCredentialsInfo = globalConfig.getUserLoginInformation(project, credentialsId2);
+		StandardCredentials certificateCredentialsInfo = globalConfig.getLoginCredentials(project, credentialsId2);
 		CertificateCredentialsImpl credentials2 = (CertificateCredentialsImpl) certificateCredentialsInfo;
-		assertEquals(credentials2.getId(), credentialsId2);
-		assertEquals(Secret.toString(credentials2.getPassword()), password2);
+		assertEquals(globalConfig.getCredentialsUser(credentials2), certUser);	// NOSONAR
+		assertEquals(credentials2.getId(), credentialsId2);						// NOSONAR
+		assertEquals(Secret.toString(credentials2.getPassword()), CERT_PASSWORD);	// NOSONAR
 
 	}
 	
-//	We need getCertificateStr() to test globalConfig.getCertificate() using certificate of type (.pfx ).
-//	We need to use a certificate of type (.pfx) because we use a default keystore of type "PKCS12".
-//	The problem is we have to export the private Key in the certificate to make it of type ".pfx" and we can't add this certificate in our plugin for security since we publish this code in GitHub so I commented out getCertificateStr().
-//	We can't run getCertificateStr() as part of HostConnectionTest since I didn't add the certificate that we need to use in the test but we can run this test manually after creating a certificate of type (.pfx )
-//	this link shows how to do this (https://mindfulsoftware.com.au/blog/1409024/Converting-a-cer-file-to-pfx-using-the-Windows-MMC-snapin).
-//	then add this certificate to compuware-common-configuration-plugin -> src/main/resources.	
-//	
-//	@Test
-//	public void getCertificateStr() throws Exception {
-//
-//		final String credentialsId2 = "credsId2";
-//
-//		final String password2 = "changeit";
-//
-//		String fullCertPath = "/newCert.pfx";
-//
-//		URL is = this.getClass().getResource(fullCertPath);
-//
-////		InputStream b = this.getClass().getResourceAsStream(fullCertPath);
-//
-//		File file = new File(is.toString());
-//
-//		String path = is.toString().substring(6);
-//
-//		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
-//
-//		KeyStoreSource keyStoreSource = new CertificateCredentialsImpl.FileOnMasterKeyStoreSource(path);
-//
-//		StandardCredentials certificateCredentials = new CertificateCredentialsImpl(CredentialsScope.GLOBAL,
-//				credentialsId2, "sample", password2, keyStoreSource);
-//
-//		CredentialsStore store = CredentialsProvider.lookupStores(Jenkins.getInstance()).iterator().next();
-//
-//		store.addCredentials(Domain.global(), certificateCredentials);
-//
-//		globalConfig.getCertificate((StandardCertificateCredentials) certificateCredentials);
-//
-//		ArgumentListBuilder args = globalConfig.ArgumentListBuilder("19.4.1", certificateCredentials, "protocol",
-//				"codePage", "timeout", "host", "port");
-//
-//		System.out.println(args.toString());
-//
-//	}
+	@Test
+	public void getCertificateStr() throws Exception {
 
+		final String credentialsId2 = "credsId2";
+		final String sampleScriptInvoke = "sample.sh";
+		final String cliVersion = "19.4.1";
+		final String credentialsDescription = "sample";
+		final String CMD_LINE = "sample.sh -host cw01 -port cw01:1234 -id \"\"EMAILADDRESS=topazrg@compuware.com, CN=TOPAZRG, OU=Engineering, O=Compuware, L=Detroit, ST=Michigan, C=US\"\" -certificate \"MIIEzzCCA7egAwIBAgITTAAAAZIMgm3xbbkmhwAAAAABkjANBgkqhkiG9w0BAQUFADA+MRQwEgYKCZImiZPyLGQBGRYEY29ycDEUMBIGCgmSJomT8ixkARkWBGNwd3IxEDAOBgNVBAMTB0NQV1ItQ0EwHhcNMjEwNTEzMTQyNzA4WhcNMjYwNTEzMTQzNzA4WjCBlDELMAkGA1UEBhMCVVMxETAPBgNVBAgTCE1pY2hpZ2FuMRAwDgYDVQQHEwdEZXRyb2l0MRIwEAYDVQQKEwlDb21wdXdhcmUxFDASBgNVBAsTC0VuZ2luZWVyaW5nMRAwDgYDVQQDEwdUT1BBWlJHMSQwIgYJKoZIhvcNAQkBFhV0b3BhenJnQGNvbXB1d2FyZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC/Q7JT0OnH/s1GaUF7ij96pX2WYeRLmVEEA3mzZRyHVbITgf+E0lzBVVXD2wLQOuhTveX4zDtKS90xvti9Fk/KBax0Uu2+Woo4hTddjuEbc/kZFe0fiWfPBdzCLwQ7Zoz+sRNbXErXUU2yVft3Br3Aj3KJBZgt7id0coLjp6aRMCbHeGwfdDcXXIlU1UCGZFt17Rz4BUYW9T6ZCEStIx3B0icHvv6JqaQ6/4GOa4W5+HwfTsQcOmQQGMGkWQX47rrRA8zyednJDq5KPuz4suSV2Acl8eETxqTyJPRmDoRHJPuH4o41w5P9eb998KC9AM/V++ju4yPgy9xYgimWAr+hAgMBAAGjggFtMIIBaTAOBgNVHQ8BAf8EBAMCBPAwEwYDVR0lBAwwCgYIKwYBBQUHAwIwHQYDVR0OBBYEFBvcPjoemlRFU4vo3nvUZ/lCRUyFMB8GA1UdIwQYMBaAFKtY9QR1tUUzvVagU1xUGdCrbwYHMGcGA1UdHwRgMF4wXKBaoFiGKWh0dHA6Ly9EVFctQ0EtU1JWUi9DZXJ0RW5yb2xsL0NQV1ItQ0EuY3JshitmaWxlOi8vLy9EVFctQ0EtU1JWUi9DZXJ0RW5yb2xsL0NQV1ItQ0EuY3JsMIGYBggrBgEFBQcBAQSBizCBiDBBBggrBgEFBQcwAoY1aHR0cDovL0RUVy1DQS1TUlZSL0NlcnRFbnJvbGwvRFRXLUNBLVNSVlJfQ1BXUi1DQS5jcnQwQwYIKwYBBQUHMAKGN2ZpbGU6Ly8vL0RUVy1DQS1TUlZSL0NlcnRFbnJvbGwvRFRXLUNBLVNSVlJfQ1BXUi1DQS5jcnQwDQYJKoZIhvcNAQEFBQADggEBAFmo+VDAChucv87vrvOfo0Mz9eI1YOiY5f6/oJcfUCvIfrksx5ZOLzgWId2tBQCX9NnEIqiJj1wMPEtEMQX53Srqlp5UIpbt0ufgvJdkYhnZPKlb/DW+natq6ipMSGvQKxSTfF5Ql5fDxWVGxOQZo8P3ZY/nXdqc/MXrLfYnuKQUlGVDiMQwLyAQHNIc4c/EAqlxTxw1wpR12nbo5U5B3jjcDylNpuqp0T9IY42yEvxJ7XJzT+iE9EeaiQJQ/P+qnBAz7l8OXLvjlaKtIe69zgRSfWSRsKrTYwfLpKRdxvOVWWS9ZyXZEWds4UNGjqOqPrM6f7xywac784TGQlmcLDA=\" -protocol TLSv1.2 -code 1047 -timeout 0";
+		
+		FreeStyleProject project = j.createFreeStyleProject();
+		
+		KeyStoreSource keyStoreSource = new CertificateCredentialsImpl.FileOnMasterKeyStoreSource(getResourcePath(CERT_FILENAME));
+		StandardCredentials certificateCredentials = new CertificateCredentialsImpl(CredentialsScope.GLOBAL,
+				credentialsId2, credentialsDescription, CERT_PASSWORD, keyStoreSource);
+		CredentialsStore store = CredentialsProvider.lookupStores(Jenkins.getInstance()).iterator().next();
+		store.addCredentials(Domain.global(), certificateCredentials);
+
+		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
+		globalConfig.addHostConnection(m_globalHostConnectionConfig);
+
+		ArgumentListBuilder args = globalConfig.getArgumentBuilder(sampleScriptInvoke, cliVersion, project, credentialsId2,
+				m_globalHostConnectionConfig.getConnectionId());
+		assertEquals("Generated cmd line assertion failure!", args.toString(), CMD_LINE);
+	}
 }
 
 
