@@ -549,6 +549,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	/**
 	 * Get an argument list builder for the common arguments.
 	 * 
+	 * @param scriptFileArg - Name of the application script used to start the CLI
 	 * @param cliVersion 	- version for testing compatibility
 	 * @param project	 	- a jenkins project
 	 * @param credentialsId - Identifier of credentials to use 
@@ -563,7 +564,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		StandardCredentials credentials = getLoginCredentials(project, credentialsId);	// NOSONAR
 		HostConnection connection = getHostConnection(connectionId);
 		return buildCommonArguments(args, cliVersion, credentials, connection.getProtocol(), connection.getCodePage(), connection.getTimeout(),
-				connection.getHost(), connection.getHostPort());
+				connection.getHost(), connection.getPort());
 	}
 
 	/**
@@ -602,8 +603,8 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 			throw new BmcJenkinsArgumentException("Unsupported credentials type!");
 		}
 		
-		args.add(CommonConstants.HOST_PARM, host);
-		args.add(CommonConstants.PORT_PARM, port);
+		args.add(CommonConstants.HOST_PARM, ArgumentUtils.escapeForScript(host));
+		args.add(CommonConstants.PORT_PARM, ArgumentUtils.escapeForScript(port));
 		if (userId != null) {
 			args.add(CommonConstants.USERID_PARM, userId);
 		}
@@ -626,7 +627,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 			args.add(CommonConstants.PROTOCOL_PARM, protocol);
 		}
 		args.add(CommonConstants.CODE_PAGE_PARM, codePage);
-		args.add(CommonConstants.TIMEOUT_PARM, timeout);
+		args.add(CommonConstants.TIMEOUT_PARM, ArgumentUtils.escapeForScript(timeout));
 		return args;
 	}
 }
