@@ -51,7 +51,7 @@ import jenkins.model.Jenkins;
  */
 public class HostConnectionTest {
 	
-	private static final String CERT_FILENAME = "/topazrg-pub.p12";
+	private static final String CERT_FILENAME = "/topaz-test.p12";
 	private static final String CERT_PASSWORD = "compuware";
 	
 	@Rule
@@ -265,7 +265,7 @@ public class HostConnectionTest {
 		final String credentialsId2 = "credsId2";
 		final String username = "bob";
 		final String password1 = "s$$cr3t";
-		final String certUser = "EMAILADDRESS=topazrg@compuware.com, CN=TOPAZRG, OU=Engineering, O=Compuware, L=Detroit, ST=Michigan, C=US";
+		final String certUser = "CN=Margaret Smith, OU=Topaz, O=BMC, L=Detroit, ST=Michigan, C=US";
 
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
 		StandardCredentials usernamePasswordCredentials = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,
@@ -301,8 +301,8 @@ public class HostConnectionTest {
 		final String sampleScriptInvoke = "sample.sh";
 		final String cliVersion = "19.4.1";
 		final String credentialsDescription = "sample";
-		final String CMD_LINE = "sample.sh -host \"cw01\" -port \"1234\" -id \"\"EMAILADDRESS=topazrg@compuware.com, CN=TOPAZRG, OU=Engineering, O=Compuware, L=Detroit, ST=Michigan, C=US\"\" -certificate \"MIIEzzCCA7egAwIBAgITTAAAAZIMgm3xbbkmhwAAAAABkjANBgkqhkiG9w0BAQUFADA+MRQwEgYKCZImiZPyLGQBGRYEY29ycDEUMBIGCgmSJomT8ixkARkWBGNwd3IxEDAOBgNVBAMTB0NQV1ItQ0EwHhcNMjEwNTEzMTQyNzA4WhcNMjYwNTEzMTQzNzA4WjCBlDELMAkGA1UEBhMCVVMxETAPBgNVBAgTCE1pY2hpZ2FuMRAwDgYDVQQHEwdEZXRyb2l0MRIwEAYDVQQKEwlDb21wdXdhcmUxFDASBgNVBAsTC0VuZ2luZWVyaW5nMRAwDgYDVQQDEwdUT1BBWlJHMSQwIgYJKoZIhvcNAQkBFhV0b3BhenJnQGNvbXB1d2FyZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC/Q7JT0OnH/s1GaUF7ij96pX2WYeRLmVEEA3mzZRyHVbITgf+E0lzBVVXD2wLQOuhTveX4zDtKS90xvti9Fk/KBax0Uu2+Woo4hTddjuEbc/kZFe0fiWfPBdzCLwQ7Zoz+sRNbXErXUU2yVft3Br3Aj3KJBZgt7id0coLjp6aRMCbHeGwfdDcXXIlU1UCGZFt17Rz4BUYW9T6ZCEStIx3B0icHvv6JqaQ6/4GOa4W5+HwfTsQcOmQQGMGkWQX47rrRA8zyednJDq5KPuz4suSV2Acl8eETxqTyJPRmDoRHJPuH4o41w5P9eb998KC9AM/V++ju4yPgy9xYgimWAr+hAgMBAAGjggFtMIIBaTAOBgNVHQ8BAf8EBAMCBPAwEwYDVR0lBAwwCgYIKwYBBQUHAwIwHQYDVR0OBBYEFBvcPjoemlRFU4vo3nvUZ/lCRUyFMB8GA1UdIwQYMBaAFKtY9QR1tUUzvVagU1xUGdCrbwYHMGcGA1UdHwRgMF4wXKBaoFiGKWh0dHA6Ly9EVFctQ0EtU1JWUi9DZXJ0RW5yb2xsL0NQV1ItQ0EuY3JshitmaWxlOi8vLy9EVFctQ0EtU1JWUi9DZXJ0RW5yb2xsL0NQV1ItQ0EuY3JsMIGYBggrBgEFBQcBAQSBizCBiDBBBggrBgEFBQcwAoY1aHR0cDovL0RUVy1DQS1TUlZSL0NlcnRFbnJvbGwvRFRXLUNBLVNSVlJfQ1BXUi1DQS5jcnQwQwYIKwYBBQUHMAKGN2ZpbGU6Ly8vL0RUVy1DQS1TUlZSL0NlcnRFbnJvbGwvRFRXLUNBLVNSVlJfQ1BXUi1DQS5jcnQwDQYJKoZIhvcNAQEFBQADggEBAFmo+VDAChucv87vrvOfo0Mz9eI1YOiY5f6/oJcfUCvIfrksx5ZOLzgWId2tBQCX9NnEIqiJj1wMPEtEMQX53Srqlp5UIpbt0ufgvJdkYhnZPKlb/DW+natq6ipMSGvQKxSTfF5Ql5fDxWVGxOQZo8P3ZY/nXdqc/MXrLfYnuKQUlGVDiMQwLyAQHNIc4c/EAqlxTxw1wpR12nbo5U5B3jjcDylNpuqp0T9IY42yEvxJ7XJzT+iE9EeaiQJQ/P+qnBAz7l8OXLvjlaKtIe69zgRSfWSRsKrTYwfLpKRdxvOVWWS9ZyXZEWds4UNGjqOqPrM6f7xywac784TGQlmcLDA=\" -protocol TLSv1.2 -code 1047 -timeout \"0\"";
-		
+		final String CMD_LINE = "sample.sh -host \"cw01\" -port \"1234\" -id \"\"CN=Margaret Smith, OU=Topaz, O=BMC, L=Detroit, ST=Michigan, C=US\"\" -certificate \"MIIEzjCCBHmgAwIBAgIEfRl9kTANBglghkgBZQMEAwIFADBpMQswCQYDVQQGEwJVUzERMA8GA1UECBMITWljaGlnYW4xEDAOBgNVBAcTB0RldHJvaXQxDDAKBgNVBAoTA0JNQzEOMAwGA1UECxMFVG9wYXoxFzAVBgNVBAMTDk1hcmdhcmV0IFNtaXRoMB4XDTIxMDUxOTE5MzYzNloXDTQ2MDUxMzE5MzYzNlowaTELMAkGA1UEBhMCVVMxETAPBgNVBAgTCE1pY2hpZ2FuMRAwDgYDVQQHEwdEZXRyb2l0MQwwCgYDVQQKEwNCTUMxDjAMBgNVBAsTBVRvcGF6MRcwFQYDVQQDEw5NYXJnYXJldCBTbWl0aDCCA0IwggI1BgcqhkjOOAQBMIICKAKCAQEAj3k12bmq6b+r7Yh6z0lRtvMuxZ47rzcY6OrElh8+/TYG50NRqcQYMzm4CefCrhxTm6dHW4XQEa24tHmHdUmEaVysDo8UszYIKKIv+icRCj1iqZNFNAmg/mlsRlj4S90ggZw3CaAQV7GVrc0AIz26VIS2KR+dZI74g0SGd5ec7AS0NKasLnXpmF3iPbApL8ERjJ/6nYGB5zONt5K3MNe540lZL2gJmHIVORXqPWuLRlPGM0WPgDsypMLg8nKQJW5OP4o7CDihxFDk4YwaKaN9316hQ95LZv8EkD7VzxYj4VjUh8YI6X8hHNgdyiPLbjgHZfgi40K+SEwFdjk5YBzWZwIdALr2lqaFePff3uf6Z8l3x4XvMrIzuuWAwLzVaV0CggEAFqZcWCBIUHBOdQKjl1cEDTTaOjR4wVTU5KXALSQu4E+W5h5L0JBKvayPN+6x4J8xgtI8kEPLZC+IAEFg7fnKCbMgdqecMqYn8kc+kYebosTnRL0ggVRMtVuALDaNH6g+1InpTg+gaI4yQopceMR4xo0FJ7ccmjq7CwvhLERoljnn08502xAaZaorh/ZMaCbbPscvS1WZg0u07bAvfJDppJbTpV1TW+v8RdT2GfY/Pe27hzklwvIk4HcxKW2oh+weR0j4fvtf3rdUhDFrIjLe5VPdrwIRKw0fAtowlzIk/ieu2oudSyki2bqL457Z4QOmPFKBC8aIt+LtQxbh7xfb3gOCAQUAAoIBAGJsJpFXqUau3tzWXFpc+MUZKFn7K9R/xyWwhmsZgR4ipIFmruVRoqG4XMyMe1z+8tI0Rt8RsbknTrA6OAUST4oukYlFNmLVgC7+Gu1nnBQJ5B3JFI4C6t8p7XIbdOxDqX6htyhDR81s+4HqojNUAEYPMJoAy6koe1JBU+8WuQhAROgHuozFDogyy9Efb/jZSfCm5DYTTZps2+gwX30UBhLVsZDRwYEdAj4/JZUyzZFyxKzxenuato3dC3Qy0foMdyZF/CPJB53p1pHrU2LWOcUcQQGmrfG29bO7jHdeCGyREN2saED0JuD9TppTrWEk8GzP4aEcRgkSW2B39LbdIsSjITAfMB0GA1UdDgQWBBQ1hkLO0+C4pKyOoMt1JnBOPzZSNzANBglghkgBZQMEAwIFAANAADA9AhwZuiLbEKBV+uHtSlOqywTwzqaQlufQmxJ984NyAh0ApX/SKgwUPmFu7aEqLp6yMWZm4SaxdasN86UJZg==\" -protocol TLSv1.2 -code 1047 -timeout \"0\"";
+
 		FreeStyleProject project = j.createFreeStyleProject();
 		
 		KeyStoreSource keyStoreSource = new CertificateCredentialsImpl.FileOnMasterKeyStoreSource(getResourcePath(CERT_FILENAME));
