@@ -16,7 +16,8 @@
  */
 package com.compuware.jenkins.common.configuration;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,7 +27,6 @@ import javax.servlet.ServletException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -49,6 +49,7 @@ import jenkins.model.Jenkins;
 /**
  * Class for testing the Compuware global host connection configuration.
  */
+@SuppressWarnings("nls")
 public class HostConnectionTest {
 	
 	private static final String CERT_FILENAME = "/topaz-test.p12";
@@ -56,9 +57,6 @@ public class HostConnectionTest {
 	
 	@Rule
 	public JenkinsRule j = new JenkinsRule();
-	
-	@Rule
-	public TemporaryFolder tmp = new TemporaryFolder();
 	
 	private HostConnection m_globalHostConnectionConfig;
 
@@ -112,7 +110,7 @@ public class HostConnectionTest {
 		// valid host:port
 		input = "abc:1234";
 		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckHostPort(input);
-		assertEquals("Expecting valid host port.", validation.kind, Kind.OK);
+		assertThat("Expecting valid host port.", validation.kind, is(equalTo(Kind.OK)));
 	}
 
 	/**
@@ -131,7 +129,7 @@ public class HostConnectionTest {
 		String actualMsg = validation.getMessage();
 		System.out.println("Expected: " + expectedMsg);
 		System.out.println("Actual  : " + expectedMsg);
-		assertEquals(msg, expectedMsg, actualMsg);
+		assertThat(msg, actualMsg, is(equalTo(expectedMsg)));
 	}
 
 	/**
@@ -147,7 +145,7 @@ public class HostConnectionTest {
 
 		input = "abc:1234";
 		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckDescription(input);
-		assertEquals("Expecting valid connection name.", validation.kind, Kind.OK);
+		assertThat("Expecting valid connection name.", validation.kind, is(equalTo(Kind.OK)));
 	}
 
 	/**
@@ -167,7 +165,7 @@ public class HostConnectionTest {
 		String actualMsg = validation.getMessage();
 		System.out.println("Expected: " + expectedMsg);
 		System.out.println("Actual  : " + expectedMsg);
-		assertEquals(msg, expectedMsg, actualMsg);
+		assertThat(msg, actualMsg, is(equalTo(expectedMsg)));
 	}
 
 	/**
@@ -199,12 +197,12 @@ public class HostConnectionTest {
 		// no timeout
 		input = "";
 		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckTimeout(input);
-		assertEquals("Expecting valid timeout when nothing is specified.", validation.kind, Kind.OK);
+		assertThat("Expecting valid timeout when nothing is specified.", validation.kind, is(equalTo(Kind.OK)));
 
 		// valid timeout
 		input = "10";
 		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckTimeout(input);
-		assertEquals("Expecting valid timeout when a whole, positive integer is specfied.", validation.kind, Kind.OK);
+		assertThat("Expecting valid timeout when a whole, positive integer is specfied.", validation.kind, is(equalTo(Kind.OK)));
 	}
 
 	/**
@@ -223,7 +221,7 @@ public class HostConnectionTest {
 		String actualMsg = validation.getMessage();
 		System.out.println("Expected: " + expectedMsg);
 		System.out.println("Actual  : " + expectedMsg);
-		assertEquals(msg, expectedMsg, actualMsg);
+		assertThat(msg, actualMsg, is(equalTo(expectedMsg)));
 	}
 
 	/**
@@ -235,31 +233,31 @@ public class HostConnectionTest {
 		// test invalid URLs
 		String input = "badurl";
 		FormValidation validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckCesUrl(input);
-		assertEquals(FormValidation.error(Messages.checkCesUrlInvalidError()).toString(), validation.toString());
+		assertThat(validation.toString(), is(equalTo(FormValidation.error(Messages.checkCesUrlInvalidError()).toString())));
 
 		input = "www.myurl.combadurl";
 		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckCesUrl(input);
-		assertEquals(FormValidation.error(Messages.checkCesUrlInvalidError()).toString(), validation.toString());
+		assertThat(validation.toString(), is(equalTo(FormValidation.error(Messages.checkCesUrlInvalidError()).toString())));
 
 		input = "www.myurl.com";
 		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckCesUrl(input);
-		assertEquals(FormValidation.error(Messages.checkCesUrlInvalidError()).toString(), validation.toString());
+		assertThat(validation.toString(), is(equalTo(FormValidation.error(Messages.checkCesUrlInvalidError()).toString())));
 
 		// test valid URLs
 		input = "https://www.myurl.com/";
 		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckCesUrl(input);
-		assertEquals(FormValidation.ok().toString(), validation.toString());
+		assertThat(validation.toString(), is(equalTo(FormValidation.ok().toString())));
 
 		input = "https://myurl.com";
 		validation = ((DescriptorImpl) m_globalHostConnectionConfig.getDescriptor()).doCheckCesUrl(input);
-		assertEquals(FormValidation.ok().toString(), validation.toString());
+		assertThat(validation.toString(), is(equalTo(FormValidation.ok().toString())));
 	}
 	
 	/**
 	 * Test retrieves login information given a credentials identifier.
 	 */
 	@Test
-	public void configure_system_credentials() throws Exception {
+	public void configureSystemCredentialsTest() throws Exception {
 
 		final String credentialsId1 = "credsId1";
 		final String credentialsId2 = "credsId2";
@@ -282,20 +280,20 @@ public class HostConnectionTest {
 
 		StandardCredentials usernamePasswordCredentialsInfo = globalConfig.getLoginCredentials(project,	credentialsId1);
 		UsernamePasswordCredentialsImpl credentials1 = (UsernamePasswordCredentialsImpl) usernamePasswordCredentialsInfo;
-		assertEquals(credentials1.getId(), credentialsId1);						// NOSONAR
-		assertEquals(credentials1.getUsername(), username);						// NOSONAR
-		assertEquals(Secret.toString(credentials1.getPassword()), password1);	// NOSONAR
+		assertThat(credentials1.getId(), is(equalTo(credentialsId1)));
+		assertThat(credentials1.getUsername(), is(equalTo(username)));
+		assertThat(Secret.toString(credentials1.getPassword()), is(equalTo(password1)));
 
 		StandardCredentials certificateCredentialsInfo = globalConfig.getLoginCredentials(project, credentialsId2);
 		CertificateCredentialsImpl credentials2 = (CertificateCredentialsImpl) certificateCredentialsInfo;
-		assertEquals(globalConfig.getCredentialsUser(credentials2), certUser);	// NOSONAR
-		assertEquals(credentials2.getId(), credentialsId2);						// NOSONAR
-		assertEquals(Secret.toString(credentials2.getPassword()), CERT_PASSWORD);	// NOSONAR
+		assertThat(globalConfig.getCredentialsUser(credentials2), is(equalTo(certUser)));
+		assertThat(credentials2.getId(), is(equalTo(credentialsId2)));
+		assertThat(Secret.toString(credentials2.getPassword()), is(equalTo(CERT_PASSWORD)));
 
 	}
 	
 	@Test
-	public void getCertificateStr() throws Exception {
+	public void getCertificateStrTest() throws Exception {
 
 		final String credentialsId2 = "credsId2";
 		final String sampleScriptInvoke = "sample.sh";
@@ -316,6 +314,6 @@ public class HostConnectionTest {
 
 		ArgumentListBuilder args = globalConfig.getArgumentBuilder(sampleScriptInvoke, cliVersion, project, credentialsId2,
 				m_globalHostConnectionConfig.getConnectionId());
-		assertEquals("Generated cmd line assertion failure!", CMD_LINE, args.toString());
+		assertThat("Generated cmd line assertion failure!", args.toString(), is(equalTo(CMD_LINE)));
 	}
 }
