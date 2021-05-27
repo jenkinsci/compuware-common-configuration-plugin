@@ -17,8 +17,10 @@
  */
 package com.compuware.jenkins.common.configuration;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.Principal;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -69,7 +71,7 @@ import net.sf.json.JSONObject;
 public class CpwrGlobalConfiguration extends GlobalConfiguration
 {
 	// Constants
-	private static Logger m_logger = Logger.getLogger("hudson.CpwrGlobalConfiguration"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger("hudson.CpwrGlobalConfiguration"); //$NON-NLS-1$
 
 	private static final String CODE_PAGE_MAPPINGS = "com.compuware.jenkins.common.configuration.codePageMappings"; //$NON-NLS-1$
 	private static final String PROTOCOL_MAPPINGS = "com.compuware.jenkins.common.configuration.protocolMappings"; //$NON-NLS-1$
@@ -139,7 +141,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		{
 			globalConfig.save();
 
-			m_logger.info("Compuware global configuration has been saved."); //$NON-NLS-1$
+			LOGGER.info("Compuware global configuration has been saved."); //$NON-NLS-1$
 		}
 	}
 
@@ -414,38 +416,8 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	 * @param location
 	 *            the install directory
 	 */
-	public void setTopazCLILocationLinux(String location)
-	{
+	public void setTopazCLILocationLinux(String location) {
 		m_topazCLILocationLinux = location;
-	}
-
-	/**
-	 * Retrieves login information given a credentials identifier.
-	 * 
-	 * @param project
-	 *            the Jenkins project
-	 * @param credentialsId
-	 *            the <code>String</code> identifier of the credentials to obtain
-	 *
-	 * @return credentials with login information
-	 */
-	public StandardUsernamePasswordCredentials getLoginInformation(Item project, String credentialsId)
-	{
-		StandardUsernamePasswordCredentials credentials = null;
-
-		List<StandardUsernamePasswordCredentials> credentialsList = CredentialsProvider.lookupCredentials(
-				StandardUsernamePasswordCredentials.class, project, ACL.SYSTEM, Collections.<DomainRequirement> emptyList());
-
-		IdMatcher matcher = new IdMatcher(credentialsId);
-		for (StandardUsernamePasswordCredentials c : credentialsList)
-		{
-			if (matcher.matches(c))
-			{
-				credentials = c;
-			}
-		}
-
-		return credentials;
 	}
 	
 	/**
@@ -458,7 +430,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	 * @return StandardCredentials object contains the credentials with login information
 	 * 			this object can be of type UsernamePasswordCredentialsImpl or CertificateCredentialsImpl.
 	 */
-	public StandardCredentials getUserLoginInformation(Item project, String credentialsId) {
+	public StandardCredentials getLoginCredentials(Item project, String credentialsId) {
 		StandardCredentials credentials = null;
 
 		List<StandardCredentials> credentialsList = CredentialsProvider.lookupCredentials(StandardCredentials.class,
@@ -474,38 +446,53 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		return credentials;
 	}
 	
-	
 	/**
-	 * Encode the specified <code>X509Certificate</code> as a Base64 string.
+	 * Get the user identified by the given credentials.
+	 * 
+	 * @param credentials
+	 *            a Jenkins <code>StandardCredentials</code> instance
+	 * 
+	 * @return String containing the user identified by the credentials
+	 * @throws AbortException
+	 *             if there is a problem with the credentials
+	 */
+	public String getCredentialsUser(StandardCredentials credentials) throws AbortException {
+		String user;
+		if (credentials instanceof StandardUsernamePasswordCredentials) {
+			user = ((StandardUsernamePasswordCredentials) credentials).getUsername();
+		} else if (credentials instanceof StandardCertificateCredentials) {
+			StandardCertificateCredentials credentialsCer = (StandardCertificateCredentials) credentials;
+			try {
+				user = getSubjectDN(getX509Certificate(credentialsCer));
+			} catch (KeyStoreException e) {
+				throw new AbortException(String.format("Unable to obtain user name from certificate: %s", e.getMessage())); //$NON-NLS-1$
+			}
+		} else {
+			throw new AbortException("Unsupported credentials type!"); //$NON-NLS-1$
+		}
+		
+		return user;
+	}
+
+	/**
+	 * Get the subject distinguished name from the specified certificate.
 	 * 
 	 * @param x509Certificate
-	 * 			An instance of <code>X509Certificate</code>.
+	 *            The instance of <code>X509Certificate</code> from which the subject distinguished name is to be returned.
 	 * 
-	 * @return	A Base64 encoded representation of the <code>X509Certificate</code>.
-	 * 			<code>null</code> is return if no <code>X509Certificate</code> provided.
-	 * 
-	 * @throws CertificateEncodingException 
+	 * @return The subject distinguished name or <code>null</code> if the name could not be retrieved
 	 */
-	public String encodeX509Certificate(X509Certificate x509Certificate) throws CertificateEncodingException {
+	public String getSubjectDN(X509Certificate x509Certificate) {
+		String subject = StringUtils.EMPTY;
+
 		if (x509Certificate != null) {
-			byte[] encodedCert = x509Certificate.getEncoded();
-			return encodeX509Certificate(encodedCert);
+			Principal subjectPrincipal = x509Certificate.getSubjectDN();
+			if (subjectPrincipal != null) {
+				subject = subjectPrincipal.getName();
+			}
 		}
 
-		return null;
-	}
-	
-	
-	/**
-	 * Encode the specified <code>X509Certificate</code>, specified as an
-	 * array of bytes as a Base64 string.
-	 * 
-	 * @param byteX509Certificate
-	 * 			An array of bytes that represents the X509Certificate
-	 */
-	public String encodeX509Certificate(byte[] byteX509Certificate)
-	{
-		return new String(Base64.encodeBase64(byteX509Certificate));
+		return subject;
 	}
 	
 	/**
@@ -517,85 +504,167 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	 *         <code>null</code> is return if no <code>X509Certificate</code>
 	 *         founded.
 	 *         
-	 * @throws KeyStoreException
-	 * @throws CertificateEncodingException
+	 * @throws KeyStoreException ~ unable to find an <code>X509Certificate</code> from a <code>StandardCertificateCredentials</code>
 	 */
-	public String getCertificate(StandardCertificateCredentials credentials)
-			throws KeyStoreException, CertificateEncodingException {
+	public X509Certificate getX509Certificate(StandardCertificateCredentials credentials) throws KeyStoreException {
 		Certificate certificate = null;
-		String certificateStr = null;
-		KeyStore keyStoreFromSystem = ((StandardCertificateCredentials) credentials).getKeyStore();
+		X509Certificate x509 = null;
+
+		KeyStore keyStoreFromSystem = credentials.getKeyStore();
 		for (Enumeration<String> enumeration = keyStoreFromSystem.aliases(); enumeration.hasMoreElements();) {
 			String alias = enumeration.nextElement();
-			if (keyStoreFromSystem.isKeyEntry(alias)) {
-				Certificate[] certificateChain = keyStoreFromSystem.getCertificateChain(alias);
-				if (certificateChain != null && certificateChain.length > 0) {
-					certificate = certificateChain[0];
-					if (certificate instanceof X509Certificate) {
-						X509Certificate x509 = (X509Certificate) certificate;
-						certificateStr = encodeX509Certificate(x509);
-
-					}
-				}
+			certificate = keyStoreFromSystem.getCertificate(alias);
+			if (certificate instanceof X509Certificate) {
+				x509 = (X509Certificate) certificate;
 			}
 		}
 
-		return certificateStr;
+		return x509;
 	}
-		
+	
 	/**
-	 * build the list of arguments to pass to the CLI
-	 * @param cliVersion
-	 * @param credentials
-	 * @param protocol
-	 * @param codePage
-	 * @param timeout
-	 * @param host
-	 * @param port
-	 * @return the list of arguments to pass to the CLI
-	 * @throws AbortException
-	 * @throws CertificateEncodingException
+	 * @param credentials An instance of
+	 *                    <code>StandardCertificateCredentials</code>.
+	 *                    
+	 * @return a string of Base64 encoded representation of the <code>X509Certificate</code>.
+	 * 			if we found this certificate in certificateChain using the keystore
+	 *         <code>null</code> is return if no <code>X509Certificate</code>
+	 *         founded.
+	 *         
+	 * @throws KeyStoreException ~ unable to create an encoded certifcate string from a <code>StandardCertificateCredentials</code>
+	 * @throws CertificateEncodingException ~ unable to encode a certifcate obtained from a <code>StandardCertificateCredentials</code>
 	 */
-	public ArgumentListBuilder ArgumentListBuilder(String cliVersion, StandardCredentials credentials, String protocol,
-			String codePage, String timeout, String host, String port)
-			throws AbortException, CertificateEncodingException {
+	public String getCertificateString(StandardCertificateCredentials credentials) throws KeyStoreException, CertificateEncodingException {
 		
-		String password = null;
-		String userId = null;
-		String certificateStr = null;
-		ArgumentListBuilder args = new ArgumentListBuilder();
+		String certString = null;
+		X509Certificate x509 = getX509Certificate(credentials);
+		
+		// Encode the X509Certificate as a Base64 string.
+		if (x509 != null) {
+			byte[] encodedCert = x509.getEncoded();
+			certString = new String(Base64.encodeBase64(encodedCert), StandardCharsets.UTF_8);
+		}
+		return certString;
+	}
 
-		if (credentials instanceof StandardUsernamePasswordCredentials) {
-			userId = ArgumentUtils.escapeForScript(((StandardUsernamePasswordCredentials) credentials).getUsername());
-			password = ArgumentUtils
-					.escapeForScript(((StandardUsernamePasswordCredentials) credentials).getPassword().getPlainText());
-		} else if (credentials instanceof StandardCertificateCredentials) {
-			StandardCertificateCredentials credentialsCer = (StandardCertificateCredentials) credentials;
-			try {
-				certificateStr = getCertificate(credentialsCer);
-			} catch (KeyStoreException e) {
-				throw new AbortException(String.format("Unable to get the certificate Exception: %s", e.getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-		}
-		args.add(CommonConstants.HOST_PARM, host);
-		args.add(CommonConstants.PORT_PARM, port);
-		if (userId != null) {
-			args.add(CommonConstants.USERID_PARM, userId);
-		}
-		if (certificateStr != null) {
-			args.add(CommonConstants.CERT_PARM, certificateStr);
-		}
-		if (password != null) {
-			args.add(CommonConstants.PW_PARM);
-			args.add(password, true);
-		}
+	/**
+	 * Get an argument list builder for the common arguments.
+	 * 
+	 * @param scriptFileArg
+	 *            the name of the application script used to start the CLI
+	 * @param cliVersion
+	 *            the CLI version for testing compatibility
+	 * @param project
+	 *            the jenkins project
+	 * @param credentialsId
+	 *            the identifier of credentials to use
+	 * @param connectionId
+	 *            the identifier of the host connection to use
+	 * 
+	 * @return a new argument list builder initialized with common arguments
+	 * @throws AbortException
+	 *             if unable to initialize the argument builder
+	 */
+	public ArgumentListBuilder getArgumentBuilder(String scriptFileArg, String cliVersion, Item project, String credentialsId,
+			String connectionId) throws AbortException {
+		ArgumentListBuilder args = new ArgumentListBuilder();
+		args.add(scriptFileArg);
+
+		HostConnection connection = getHostConnection(connectionId);
+		addConnectionArgs(args, connection, cliVersion);
+
+		StandardCredentials credentials = getLoginCredentials(project, credentialsId);
+		addCredentialsArgs(args, credentials);
+
+		return args;
+	}
+
+	/**
+	 * Adds the connection arguments.
+	 * 
+	 * @param args
+	 *            the argument list builder to add the connection details to
+	 * @param connection
+	 *            the connection to add
+	 * @param cliVersion
+	 *            the CLI version
+	 * @throws AbortException
+	 *             if the encryption protocol is not supported
+	 */
+	private void addConnectionArgs(ArgumentListBuilder args, HostConnection connection, String cliVersion) throws AbortException {
+		args.add(CommonConstants.HOST_PARM, ArgumentUtils.escapeForScript(connection.getHost()));
+		args.add(CommonConstants.PORT_PARM, ArgumentUtils.escapeForScript(connection.getPort()));
+
 		// do not pass protocol on command line if null, empty, blank, or 'None'
+		String protocol = connection.getProtocol();
 		if (StringUtils.isNotBlank(protocol) && !StringUtils.equalsIgnoreCase(protocol, "none")) { //$NON-NLS-1$
 			CLIVersionUtils.checkProtocolSupported(cliVersion);
 			args.add(CommonConstants.PROTOCOL_PARM, protocol);
 		}
-		args.add(CommonConstants.CODE_PAGE_PARM, codePage);
-		args.add(CommonConstants.TIMEOUT_PARM, timeout);
-		return args;
+
+		args.add(CommonConstants.CODE_PAGE_PARM, connection.getCodePage());
+		args.add(CommonConstants.TIMEOUT_PARM, ArgumentUtils.escapeForScript(connection.getTimeout()));
+	}
+
+	/**
+	 * Adds the credentials arguments.
+	 * 
+	 * @param args
+	 *            the argument list builder to add the credentials to
+	 * @param credentials
+	 *            the credentials to add
+	 * @throws AbortException
+	 *             if there is a problem with the credentials
+	 */
+	private void addCredentialsArgs(ArgumentListBuilder args, StandardCredentials credentials) throws AbortException {
+		if (credentials instanceof StandardUsernamePasswordCredentials) {
+			addUsernamePasswordCredentialsArgs(args, (StandardUsernamePasswordCredentials) credentials);
+		} else if (credentials instanceof StandardCertificateCredentials) {
+			addCertificateCredentialsArgs(args, (StandardCertificateCredentials) credentials);
+		} else {
+			throw new AbortException("Unsupported credentials type!"); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Adds the certificate credentials arguments.
+	 * 
+	 * @param args
+	 *            the argument list builder to add the credentials to
+	 * @param credentials
+	 *            the certificate credentials to add
+	 * @throws AbortException
+	 *             if there is a problem with the credentials
+	 */
+	private void addCertificateCredentialsArgs(ArgumentListBuilder args, StandardCertificateCredentials credentials) throws AbortException {
+		String userId = ArgumentUtils.escapeForScript(getCredentialsUser(credentials));
+		if (userId != null) {
+			args.add(CommonConstants.USERID_PARM, userId);
+		}
+		try {
+			String certificateStr = ArgumentUtils.escapeForScript(getCertificateString(credentials));
+			if (certificateStr != null) {
+				args.add(CommonConstants.CERT_PARM, certificateStr);
+			}
+		} catch (KeyStoreException | CertificateEncodingException e) {
+			throw new AbortException(String.format("Unable to add certificate credentials: %s", e.getMessage())); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Adds the username and password credentials arguments.
+	 * 
+	 * @param args
+	 *            the argument list builder to add the credentials to
+	 * @param credentials
+	 *            the username and password credentials to add
+	 */
+	private void addUsernamePasswordCredentialsArgs(ArgumentListBuilder args, StandardUsernamePasswordCredentials credentials) {
+		String userId = ArgumentUtils.escapeForScript(credentials.getUsername());
+		args.add(CommonConstants.USERID_PARM, userId);
+
+		String password = ArgumentUtils.escapeForScript(credentials.getPassword().getPlainText());
+		args.add(CommonConstants.PW_PARM);
+		args.add(password, true);
 	}
 }
