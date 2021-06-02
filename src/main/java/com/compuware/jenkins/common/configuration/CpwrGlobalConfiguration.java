@@ -637,12 +637,10 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	 *             if there is a problem with the credentials
 	 */
 	private void addCertificateCredentialsArgs(ArgumentListBuilder args, StandardCertificateCredentials credentials) throws AbortException {
-		String userId = ArgumentUtils.escapeForScript(getCredentialsUser(credentials));
-		if (userId != null) {
-			args.add(CommonConstants.USERID_PARM, userId);
-		}
+		// Don't add userid for now.  This comes out as a long string and causes problems with the CLI argument parser.
 		try {
-			String certificateStr = ArgumentUtils.escapeForScript(getCertificateString(credentials));
+			// 2021-06-01 Escaped cert fails. so pass it as is.
+			String certificateStr = getCertificateString(credentials);
 			if (certificateStr != null) {
 				args.add(CommonConstants.CERT_PARM, certificateStr);
 			}
