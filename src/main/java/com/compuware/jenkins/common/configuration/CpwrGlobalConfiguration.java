@@ -642,7 +642,8 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 			// 2021-06-01 Escaped cert fails. so pass it as is.
 			String certificateStr = getCertificateString(credentials);
 			if (certificateStr != null) {
-				args.add(CommonConstants.CERT_PARM, certificateStr);
+				args.add(CommonConstants.CERT_PARM);
+				args.add(certificateStr, true);
 			}
 		} catch (KeyStoreException | CertificateEncodingException e) {
 			throw new AbortException(String.format("Unable to add certificate credentials: %s", e.getMessage())); //$NON-NLS-1$
