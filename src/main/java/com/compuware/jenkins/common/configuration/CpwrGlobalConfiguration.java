@@ -640,7 +640,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		// Don't add userid for now.  This comes out as a long string and causes problems with the CLI argument parser.
 		try {
 			// 2021-06-01 Escaped cert fails. so pass it as is.
-			String certificateStr = getCertificateString(credentials);
+			String certificateStr = ArgumentUtils.wrapInDoubleQuotes(getCertificateString(credentials));
 			if (certificateStr != null) {
 				args.add(CommonConstants.CERT_PARM);
 				args.add(certificateStr, true);
