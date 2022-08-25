@@ -189,6 +189,8 @@ public class CLIVersionUtils
 		try
 		{
 		    DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		    dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true); 
+		    dbFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
 		    DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		    Document document = dBuilder.parse(versionfile);
 		    
