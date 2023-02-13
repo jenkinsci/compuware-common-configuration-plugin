@@ -3,5 +3,5 @@
   This view is used to render the installed plugins page.
 -->
 <div>
-  This plugin provides access to Compuware global configurations.
+  This plugin provides access to BMC global configurations.
 </div>
