@@ -56,7 +56,7 @@ At BMC, we strive to make our products and documentation the best in the industr
 
 - The name, release number, and build number of your product. This information is displayed in the installed extensions page. Apply filter: BMC in order to display all of the installed BMC extension.
 
-- Environment information, such as the operating system and release on which the Topaz CLI is installed.
+- Environment information, such as the operating system and release on which the Workbench for Eclipse CLI is installed.
 
 You can contact BMC in one of the following ways:
 
