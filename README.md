@@ -1,8 +1,8 @@
-# BMC Common Configuration
+# <img src="images/bmc_brandmark.png" width="45" height="45">BMC AMI Common Configuration
 
 ## Overview
 
-The BMC Common Configuration provides configuration settings that are shared by other BMC Jenkins plugins.
+The BMC AMI Common Configuration provides configuration settings that are shared by other BMC Jenkins plugins.
 
 ## Prerequisites
 
@@ -52,7 +52,7 @@ You can access online information for BMC products via our Support Center site a
 
 At BMC, we strive to make our products and documentation the best in the industry. Feedback from our customers helps us maintain our quality standards. If you need support services, please obtain the following information before calling BMC\'s 24-hour telephone support:
 
-- The Azure pipeline job output that contains any error messages or pertinent information.
+- The Jenkins job output that contains any error messages or pertinent information.
 
 - The name, release number, and build number of your product. This information is displayed in the installed extensions page. Apply filter: BMC in order to display all of the installed BMC extension.
 
