@@ -23,8 +23,8 @@
     <java.level>8</java.level>
   </properties>
 
-  <name>Compuware Common Configuration</name>
-  <description>Compuware Topaz (R) interface to specify common configuration parameters</description>
+  <name>BMC AMI Common Configuration</name>
+  <description>Workbench for Eclipse interface to specify common configuration parameters</description>
   <url>https://github.com/jenkinsci/compuware-common-configuration-plugin</url>
 
   <licenses>

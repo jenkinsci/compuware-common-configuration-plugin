@@ -1,10 +1,8 @@
-# Compuware Common Configuration Plugin
-
-[![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/compuware-common-configuration.svg)](https://plugins.jenkins.io/compuware-common-configuration) [![GitHub release](https://img.shields.io/github/v/release/jenkinsci/compuware-common-configuration-plugin.svg?label=release)](https://github.com/jenkinsci/compuware-common-configuration-plugin/releases/latest) [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/compuware-common-configuration.svg?color=blue)](https://plugins.jenkins.io/compuware-common-configuration)
+# <img src="images/bmc_brandmark.png" width="45" height="45">BMC AMI Common Configuration
 
 ## Overview
 
-The Compuware Common Configuration provides configuration settings that are shared by other Compuware Jenkins plugins.
+The BMC AMI Common Configuration provides configuration settings that are shared by other BMC Jenkins plugins.
 
 ## Prerequisites
 
@@ -12,17 +10,17 @@ The following are required to use this plugin:
 - Jenkins
 - Jenkins Credentials Plugin
 
-## Configuring for Topaz Workbench CLI & Host Connections
+## Configuring for Workbench for Eclipse CLI & Host Connections
 
-In order to download Endevor, PDS, and ISPW members you will need to point to an installed Topaz Workbench Command Line Interface (CLI). The Topaz Workbench CLI will work with host connection(s) you also need to configure to download Endevor, PDS, and ISPW members.
+In order to download Endevor, PDS, and Code Pipeline members you will need to point to an installed Workbench for Eclipse Command Line Interface (CLI). The Workbench for Eclipse CLI will work with host connection(s) you also need to configure to download Endevor, PDS, and Code Pipeline members.
 
-Navigate to Manage Jenkins / Configure System and go to Compuware Configurations section.
+Navigate to Manage Jenkins / Configure System and go to Common Configurations section.
 
-- **Windows Topaz Workbench CLI home** : Point to the Windows installation location of the CLI. If necessary, change the default values given to match the correct installation location.
+- **Windows Workbench for Eclipse CLI home** : Point to the Windows installation location of the CLI. If necessary, change the default values given to match the correct installation location.
 
-- **Linux Topaz Workbench CLI home** : Point to the Linux installation location of the CLI. If necessary, change the default values given to match the correct installation location.
+- **Linux Workbench for Eclipse CLI home** : Point to the Linux installation location of the CLI. If necessary, change the default values given to match the correct installation location.
 
-![](docs/images/info.svg) The Topaz Workbench CLI must be installed on the machine that is configured to run the job.
+![](docs/images/info.svg) The Workbench for Eclipse CLI must be installed on the machine that is configured to run the job.
 
 **Host connections**
 
@@ -38,48 +36,37 @@ Navigate to Manage Jenkins / Configure System and go to Compuware Configurations
 
 - **Read/write timeout (minutes)** : Enter the number of minutes for the plugin to wait for a response from the host before timing out.
 
-- **CES URL** : Optionally, enter a URL for Compuware Enterprise Services (CES). This URL is used by other Compuware plugins that leverage REST APIs hosted by CES, for example Compuware's ISPW.
+- **CES URL** : Optionally, enter a URL for Common Enterprise Services (CES). This URL is used by other BMC plugins that leverage REST APIs hosted by CES, for example BMC's Code Pipeline.
 
 - **Connection ID** : An internal unique ID by which these connections are identified from jobs and other configuration. If the supplied identifier is null or empty, then a unique identifier is generated. Useful to specify explicitly when using connections from pipeline scripts.
 
 ## Product Assistance
 
-Compuware provides assistance for customers with its documentation, the Compuware Support Center web site, and telephone customer support.
+BMC provides assistance for customers with its documentation, the BMC Support Center web site, and telephone customer support.
 
-### Compuware Support Center
+### BMC Support Center
 
-You can access online information for Compuware products via our Support Center site at [https://support.compuware.com](https://support.compuware.com/). Support Center provides access to critical information about your Compuware products. You can review frequently asked questions, read or download documentation, access product fixes, or e-mail your questions or comments. The first time you access Support Center, you must register and obtain a password. Registration is free.
+You can access online information for BMC products via our Support Center site at [https://support.bmc.com](https://support.bmc.com/). Support Center provides access to critical information about your BMC products. You can review frequently asked questions, read or download documentation, access product fixes, or e-mail your questions or comments. The first time you access Support Center, you must register and obtain a password. Registration is free.
 
 ### Contacting Customer Support
 
-At Compuware, we strive to make our products and documentation the best in the industry. Feedback from our customers helps us maintain our quality standards. If you need support services, please obtain the following information before calling Compuware\'s 24-hour telephone support:
+At BMC, we strive to make our products and documentation the best in the industry. Feedback from our customers helps us maintain our quality standards. If you need support services, please obtain the following information before calling BMC\'s 24-hour telephone support:
 
-- The Jenkins job console output that contains any error messages or pertinent information.
+- The Jenkins job output that contains any error messages or pertinent information.
 
-- The name, release number, and build number of your product. This information is displayed in the Jenkins / Plugin Manager and go to the Installed tab. Apply filter: Compuware in order to display all of the installed Compuware plugins.
+- The name, release number, and build number of your product. This information is displayed in the installed extensions page. Apply filter: BMC in order to display all of the installed BMC extension.
 
-- Job information, whether the job uses Pipeline script or Freestyle project.
+- Environment information, such as the operating system and release on which the Workbench for Eclipse CLI is installed.
 
-- Environment information, such as the operating system and release on which the Topaz CLI is installed.
+You can contact BMC in one of the following ways:
 
-You can contact Compuware in one of the following ways:
-
-#### Phone
-
-- USA and Canada: 1-800-538-7822 or 1-313-227-5444.
-
-- All other countries: Contact your local Compuware office. Contact information is available at [https://support.compuware.com](https://support.compuware.com/).
 
 #### Web
 
-You can report issues via Compuware Support Center: [https://support.compuware.com](https://support.compuware.com/).
+You can report issues via BMC Support Center: [https://support.bmc.com](https://support.bmc.com/).
 
 Note: Please report all high-priority issues by phone.
 
 ### Corporate Web Site
 
-To access Compuware\'s site on the Web, go to [https://www.compuware.com](https://www.compuware.com/). The Compuware site provides a variety of product and support information.
-
-## Change Log
-
-See [Change Log](https://github.com/jenkinsci/compuware-common-configuration-plugin/blob/master/CHANGELOG.md)
+To access BMC site on the Web, go to [https://www.bmc.com/](https://www.bmc.com/). The BMC site provides a variety of product and support information.
