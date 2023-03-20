@@ -53,8 +53,16 @@ import jenkins.model.Jenkins;
 public class HostConnectionTest {
 	
 	private static final String CERT_FILENAME = "/topaz-test.p12";
-	private static final String CERT_PASSWORD = "compuware";
-	
+	private static final String CERT_PASSWORD;
+
+	static {
+		try {
+			CERT_PASSWORD = HostConnectionProps.getProperties("certPassword");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@Rule
 	public JenkinsRule j = new JenkinsRule();
 	
@@ -262,7 +270,7 @@ public class HostConnectionTest {
 		final String credentialsId1 = "credsId1";
 		final String credentialsId2 = "credsId2";
 		final String username = "bob";
-		final String password1 = "s$$cr3t";
+		final String password1 = HostConnectionProps.getProperties("password");
 		final String certUser = "CN=Margaret Smith, OU=Topaz, O=BMC, L=Detroit, ST=Michigan, C=US";
 
 		CpwrGlobalConfiguration globalConfig = CpwrGlobalConfiguration.get();
