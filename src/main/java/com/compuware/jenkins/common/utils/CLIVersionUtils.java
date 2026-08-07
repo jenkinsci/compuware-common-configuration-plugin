@@ -26,7 +26,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -34,6 +33,7 @@ import com.compuware.jenkins.common.configuration.Messages;
 
 import hudson.AbortException;
 import hudson.FilePath;
+import hudson.Util;
 
 /**
  *	Utility class used to check the version of the installed Topaz CLI.
@@ -101,7 +101,7 @@ public class CLIVersionUtils
 	 */
 	public static void checkCLICompatibility(String version, String minimumVersion) throws IOException, InterruptedException
 	{
-		if (StringUtils.isEmpty(version))
+		if (Util.fixEmpty(version) == null)
 		{
 			throw new AbortException(Messages.cliOldUnknownVersionError(minimumVersion));
 		}
@@ -152,13 +152,13 @@ public class CLIVersionUtils
 	 */
 	private static int compareVersions(String cliVersion, String minimumVersion)
 	{
-		if (StringUtils.isEmpty(cliVersion))
+		if (Util.fixEmpty(cliVersion) == null)
 		{
 			return -1;
 		}
 
-		String[] minimumVersionParts = StringUtils.split(minimumVersion, '.');
-		String[] cliVersionParts = StringUtils.split(cliVersion, '.');
+		String[] minimumVersionParts = splitOnDot(minimumVersion);
+		String[] cliVersionParts = splitOnDot(cliVersion);
 
 		int length = Math.max(minimumVersionParts.length, cliVersionParts.length);
 		for (int i = 0; i < length; i++)
@@ -202,6 +202,27 @@ public class CLIVersionUtils
 		}
 		
 		return version;
+	}
+
+	/**
+	 * Splits on '.' discarding empty tokens, matching Commons Lang's {@code StringUtils.split}
+	 * (which differs from {@code String.split}, that keeps them).
+	 */
+	private static String[] splitOnDot(String value)
+	{
+		if (value == null)
+		{
+			return null;
+		}
+		java.util.List<String> parts = new java.util.ArrayList<>();
+		for (String part : value.split("\\."))
+		{
+			if (!part.isEmpty())
+			{
+				parts.add(part);
+			}
+		}
+		return parts.toArray(new String[0]);
 	}
 
 }

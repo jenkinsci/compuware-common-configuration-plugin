@@ -16,6 +16,7 @@
  */
 package com.compuware.jenkins.common.utils;
 
+import hudson.Util;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
@@ -54,7 +55,7 @@ public class ArgumentUtils
 	{
 		String output = input;
 
-		if (StringUtils.isNotEmpty(input))
+		if (Util.fixEmpty(input) != null)
 		{
 			// escape any double quote (") with another double quote (")
 			output = StringUtils.replace(input, CommonConstants.DOUBLE_QUOTE, CommonConstants.DOUBLE_QUOTE_ESCAPED);
@@ -83,7 +84,7 @@ public class ArgumentUtils
 	{
 		String output = input;
 
-		if (StringUtils.isNotEmpty(input))
+		if (Util.fixEmpty(input) != null)
 		{
 			// remove all double quotes from the path
 			output = StringUtils.remove(input, CommonConstants.DOUBLE_QUOTE);
@@ -109,7 +110,7 @@ public class ArgumentUtils
 	{
 		String output = input;
 
-		if (StringUtils.isNotEmpty(input))
+		if (Util.fixEmpty(input) != null)
 		{
 			output = StringUtils.prependIfMissing(input, CommonConstants.DOUBLE_QUOTE);
 			output = StringUtils.appendIfMissing(output, CommonConstants.DOUBLE_QUOTE);
@@ -132,7 +133,7 @@ public class ArgumentUtils
 	{
 		String output = input;
 
-		if (StringUtils.isNotEmpty(input))
+		if (Util.fixEmpty(input) != null)
 		{
 			output = StringUtils.prependIfMissing(input, CommonConstants.DASH);
 		}
@@ -159,7 +160,7 @@ public class ArgumentUtils
 	{
 		Properties properties = new Properties();
 
-		if (StringUtils.isNotEmpty(propertiesString))
+		if (Util.fixEmpty(propertiesString) != null)
 		{
 			// escape any backslashes before loading the properties (the load() call will remove them, as per its javadoc)
 			String escapedPropertiesString = StringUtils.replace(propertiesString, CommonConstants.BACKSLASH,

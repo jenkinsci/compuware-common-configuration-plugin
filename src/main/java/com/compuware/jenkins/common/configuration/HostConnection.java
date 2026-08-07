@@ -20,7 +20,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -30,6 +29,7 @@ import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
+import hudson.Util;
 
 /**
  * Class used to store the data for a host connection.
@@ -66,13 +66,13 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	@DataBoundConstructor
 	public HostConnection(String description, String hostPort, String protocol, String codePage, String timeout, String connectionId, String cesUrl)
 	{
-		m_description = StringUtils.trimToEmpty(description);
-		m_hostPort = StringUtils.trimToEmpty(hostPort);
-		m_protocol = StringUtils.trimToEmpty(protocol);
-		m_codePage = StringUtils.trimToEmpty(codePage);
-		m_timeout = StringUtils.trimToEmpty(timeout);
+		m_description = Util.fixNull(description).trim();
+		m_hostPort = Util.fixNull(hostPort).trim();
+		m_protocol = Util.fixNull(protocol).trim();
+		m_codePage = Util.fixNull(codePage).trim();
+		m_timeout = Util.fixNull(timeout).trim();
 		m_connectionId = generateId(connectionId);
-		m_cesUrl = StringUtils.trimToEmpty(cesUrl);
+		m_cesUrl = Util.fixNull(cesUrl).trim();
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 */
 	public String getHost()
 	{
-		return StringUtils.substringBefore(getHostPort(), CommonConstants.COLON);
+		return substringBefore(getHostPort(), CommonConstants.COLON);
 	}
 
 	/**
@@ -152,7 +152,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 */
 	public String getPort()
 	{
-		return StringUtils.substringAfter(getHostPort(), CommonConstants.COLON);
+		return substringAfter(getHostPort(), CommonConstants.COLON);
 	}
 
 	/**
@@ -184,7 +184,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	 */
 	public String getTimeout()
 	{
-		return StringUtils.isBlank(m_timeout) ? "0" : m_timeout; //$NON-NLS-1$
+		return Util.fixEmptyAndTrim(m_timeout) == null ? "0" : m_timeout; //$NON-NLS-1$
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 	{
 		String generatedId = id;
 
-		if (StringUtils.isEmpty(generatedId))
+		if (Util.fixEmpty(generatedId) == null)
 		{
 			generatedId = UUID.randomUUID().toString();
 		}
@@ -277,18 +277,18 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 		{
 			FormValidation result;
 
-			String tempValue = StringUtils.trimToEmpty(value);
+			String tempValue = Util.fixNull(value).trim();
 			if (tempValue.isEmpty())
 			{
 				result = FormValidation.error(Messages.checkHostPortEmptyError());
 			}
 			else
 			{
-				String[] hostPortParts = StringUtils.split(tempValue, CommonConstants.COLON);
+				String[] hostPortParts = splitDiscardingEmpty(tempValue, CommonConstants.COLON);
 				if (hostPortParts.length == 2)
 				{
-					String host = StringUtils.trimToEmpty(hostPortParts[0]);
-					String port = StringUtils.trimToEmpty(hostPortParts[1]);
+					String host = Util.fixNull(hostPortParts[0]).trim();
+					String port = Util.fixNull(hostPortParts[1]).trim();
 					result = validateHostPort(host, port);
 				}
 				else if (hostPortParts.length > 2)
@@ -338,7 +338,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 			{
 				result = FormValidation.error(Messages.checkHostPortMissingPortError());
 			}
-			else if (!StringUtils.isNumeric(port))
+			else if ((port.isEmpty() || !port.chars().allMatch(Character::isDigit)))
 			{
 				result = FormValidation.error(Messages.checkHostPortInvalidPortError());
 			}
@@ -356,7 +356,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 		 */
 		public FormValidation doCheckDescription(@QueryParameter String value)
 		{
-			String tempValue = StringUtils.trimToEmpty(value);
+			String tempValue = Util.fixNull(value).trim();
 			if (tempValue.isEmpty())
 			{
 				return FormValidation.error(Messages.checkDescriptionEmptyError());
@@ -375,10 +375,10 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 		 */
 		public FormValidation doCheckTimeout(@QueryParameter String value)
 		{
-			String tempValue = StringUtils.trimToEmpty(value);
+			String tempValue = Util.fixNull(value).trim();
 			if (!tempValue.isEmpty())
 			{
-				if (!StringUtils.isNumeric(tempValue))
+				if ((tempValue.isEmpty() || !tempValue.chars().allMatch(Character::isDigit)))
 				{
 					return FormValidation.error(Messages.checkTimeoutError());
 				}
@@ -410,7 +410,7 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 		{
 			FormValidation result = FormValidation.ok();
 
-			if (StringUtils.isNotBlank(value))
+			if (Util.fixEmptyAndTrim(value) != null)
 			{
 				// verify if url is valid
 				if (!value.endsWith("/")) //$NON-NLS-1$
@@ -430,4 +430,53 @@ public class HostConnection extends AbstractDescribableImpl<HostConnection>
 			return result;
 		}
 	}
+
+	/** Everything before the first {@code separator}, or the whole string when it is absent. */
+	private static String substringBefore(String str, String separator)
+	{
+		if (str == null || str.isEmpty() || separator == null)
+		{
+			return str;
+		}
+		int index = str.indexOf(separator);
+		return index < 0 ? str : str.substring(0, index);
+	}
+
+	/** Everything after the first {@code separator}, or an empty string when it is absent. */
+	private static String substringAfter(String str, String separator)
+	{
+		if (str == null || str.isEmpty())
+		{
+			return str;
+		}
+		if (separator == null)
+		{
+			return ""; //$NON-NLS-1$
+		}
+		int index = str.indexOf(separator);
+		return index < 0 ? "" : str.substring(index + separator.length()); //$NON-NLS-1$
+	}
+
+
+	/**
+	 * Splits on {@code separator} discarding empty tokens, matching Commons Lang's
+	 * {@code StringUtils.split} (which differs from {@code String.split}, that keeps them).
+	 */
+	private static String[] splitDiscardingEmpty(String value, String separator)
+	{
+		if (value == null)
+		{
+			return null;
+		}
+		java.util.List<String> parts = new java.util.ArrayList<>();
+		for (String part : value.split(java.util.regex.Pattern.quote(separator)))
+		{
+			if (!part.isEmpty())
+			{
+				parts.add(part);
+			}
+		}
+		return parts.toArray(new String[0]);
+	}
+
 }
