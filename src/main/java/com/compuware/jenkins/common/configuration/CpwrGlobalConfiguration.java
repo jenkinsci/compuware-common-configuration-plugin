@@ -36,7 +36,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -63,6 +62,7 @@ import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import hudson.Util;
 
 /**
  * Class to handle Compuware global configuration settings.
@@ -221,8 +221,8 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	{
 		HostConnection connection = null;
 
-		String host = StringUtils.substringBefore(hostPort, CommonConstants.COLON);
-		String port = StringUtils.substringAfter(hostPort, CommonConstants.COLON);
+		String host = substringBefore(hostPort, CommonConstants.COLON);
+		String port = substringAfter(hostPort, CommonConstants.COLON);
 		for (HostConnection conn : m_hostConnections)
 		{
 			if (conn.getHost().equalsIgnoreCase(host) && conn.getPort().equalsIgnoreCase(port)
@@ -483,7 +483,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 	 * @return The subject distinguished name or <code>null</code> if the name could not be retrieved
 	 */
 	public String getSubjectDN(X509Certificate x509Certificate) {
-		String subject = StringUtils.EMPTY;
+		String subject = "";
 
 		if (x509Certificate != null) {
 			Principal subjectPrincipal = x509Certificate.getSubjectDN();
@@ -597,7 +597,7 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 
 		// do not pass protocol on command line if null, empty, blank, or 'None'
 		String protocol = connection.getProtocol();
-		if (StringUtils.isNotBlank(protocol) && !StringUtils.equalsIgnoreCase(protocol, "none")) { //$NON-NLS-1$
+		if (Util.fixEmptyAndTrim(protocol) != null && !"none".equalsIgnoreCase(protocol)) { //$NON-NLS-1$
 			CLIVersionUtils.checkProtocolSupported(cliVersion);
 			args.add(CommonConstants.PROTOCOL_PARM, protocol);
 		}
@@ -666,4 +666,32 @@ public class CpwrGlobalConfiguration extends GlobalConfiguration
 		args.add(CommonConstants.PW_PARM);
 		args.add(password, true);
 	}
+
+	/** Everything before the first {@code separator}, or the whole string when it is absent. */
+	private static String substringBefore(String str, String separator)
+	{
+		if (str == null || str.isEmpty() || separator == null)
+		{
+			return str;
+		}
+		int index = str.indexOf(separator);
+		return index < 0 ? str : str.substring(0, index);
+	}
+
+	/** Everything after the first {@code separator}, or an empty string when it is absent. */
+	private static String substringAfter(String str, String separator)
+	{
+		if (str == null || str.isEmpty())
+		{
+			return str;
+		}
+		if (separator == null)
+		{
+			return ""; //$NON-NLS-1$
+		}
+		int index = str.indexOf(separator);
+		return index < 0 ? "" : str.substring(index + separator.length()); //$NON-NLS-1$
+	}
+
+
 }
