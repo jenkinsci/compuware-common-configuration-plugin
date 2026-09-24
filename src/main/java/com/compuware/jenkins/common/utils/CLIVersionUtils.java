@@ -2,7 +2,8 @@
  * The MIT License (MIT)
  * 
  * Copyright (c) 2015 - 2019 Compuware Corporation
- * 
+ * (c) Copyright 2019-2026 BMC Software, Inc.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
  * and associated documentation files (the "Software"), to deal in the Software without restriction, 
  * including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
@@ -22,6 +23,7 @@ package com.compuware.jenkins.common.utils;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,6 +42,11 @@ import hudson.FilePath;
  */
 public class CLIVersionUtils
 {
+
+	private static final String SAX_GENERAL_ENTITIES_FEATURE = "http://xml.org/sax/features/external-general-entities"; //$NON-NLS-1$
+	private static final String SAX_PARAMETER_ENTITIES_FEATURE = "http://xml.org/sax/features/external-parameter-entities"; //$NON-NLS-1$
+	private static final String DISALLOW_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl"; //$NON-NLS-1$
+	private static final String LOAD_EXTERNAL_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd"; //$NON-NLS-1$
 
 	public static final String HOST_CONNECTION_PROTOCOL_MINIMUM_VERSION = "19.4.1"; //$NON-NLS-1$
 
@@ -189,8 +196,7 @@ public class CLIVersionUtils
 		try
 		{
 		    DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		    dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true); 
-		    dbFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+		    configureSecureDocumentBuilderFactory(dbFactory);
 		    DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		    Document document = dBuilder.parse(versionfile);
 		    
@@ -202,6 +208,18 @@ public class CLIVersionUtils
 		}
 		
 		return version;
+	}
+
+	private static void configureSecureDocumentBuilderFactory(DocumentBuilderFactory dbFactory)
+			throws ParserConfigurationException
+	{
+		dbFactory.setFeature(SAX_GENERAL_ENTITIES_FEATURE, false);
+		dbFactory.setFeature(SAX_PARAMETER_ENTITIES_FEATURE, false);
+		dbFactory.setFeature(DISALLOW_DOCTYPE_DECL, true);
+		dbFactory.setFeature(LOAD_EXTERNAL_DTD, false);
+		dbFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		dbFactory.setXIncludeAware(false);
+		dbFactory.setExpandEntityReferences(false);
 	}
 
 }
